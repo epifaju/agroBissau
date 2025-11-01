@@ -1,0 +1,246 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String      @id @default(cuid())
+  email             String      @unique
+  password          String?     // Nullable for OAuth users
+  phone             String?     @unique
+  firstName         String
+  lastName          String
+  avatar            String?
+  role              UserRole    @default(MEMBER)
+  subscriptionTier  SubTier     @default(FREE)
+  verificationLevel Int         @default(0)
+  isActive          Boolean     @default(true)
+  location          Json?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  listings          Listing[]
+  messages          Message[]   @relation("SentMessages")
+  receivedMessages  Message[]   @relation("ReceivedMessages")
+  reviews           Review[]    @relation("ReviewsGiven")
+  reviewsReceived   Review[]    @relation("ReviewsReceived")
+  transactions      Transaction[]
+  subscription      Subscription?
+  pushSubscriptions PushSubscription[]
+  notifications     Notification[]
+  notificationPreferences NotificationPreferences?
+
+  @@map("users")
+}
+
+model Listing {
+  id              String        @id @default(cuid())
+  title           String
+  description     String
+  price           Decimal
+  unit            String
+  quantity        Int
+  availableFrom   DateTime?
+  expiresAt       DateTime?
+  category        Category      @relation(fields: [categoryId], references: [id])
+  categoryId      String
+  subcategory     String?
+  type            ListingType
+  status          ListingStatus @default(ACTIVE)
+  images          String[]
+  location        Json
+  isFeatured      Boolean       @default(false)
+  featuredUntil   DateTime?
+  viewCount       Int           @default(0)
+  contactCount    Int           @default(0)
+  
+  user            User          @relation(fields: [userId], references: [id])
+  userId          String
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  transactions    Transaction[]
+  reviews         Review[]
+
+  @@map("listings")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  namePortuguese String?
+  icon        String?
+  description String?
+  isActive    Boolean   @default(true)
+  order       Int       @default(0)
+  
+  listings    Listing[]
+  
+  @@map("categories")
+}
+
+model Message {
+  id         String      @id @default(cuid())
+  content    String
+  isRead     Boolean     @default(false)
+  sender     User        @relation("SentMessages", fields: [senderId], references: [id])
+  senderId   String
+  receiver   User        @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiverId String
+  listingId  String?
+  createdAt  DateTime    @default(now())
+  
+  @@map("messages")
+}
+
+model Transaction {
+  id              String            @id @default(cuid())
+  amount          Decimal
+  paymentMethod   PaymentMethod
+  status          TransactionStatus @default(PENDING)
+  buyer           User              @relation(fields: [buyerId], references: [id])
+  buyerId         String
+  listing         Listing           @relation(fields: [listingId], references: [id])
+  listingId       String
+  paymentReference String?
+  
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  
+  @@map("transactions")
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  rating      Int
+  comment     String?
+  response    String?
+  reviewer    User     @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  reviewerId  String
+  reviewed    User     @relation("ReviewsReceived", fields: [reviewedId], references: [id])
+  reviewedId  String
+  listing     Listing  @relation(fields: [listingId], references: [id])
+  listingId   String
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([reviewerId, listingId])
+  @@map("reviews")
+}
+
+model Subscription {
+  id              String    @id @default(cuid())
+  tier            SubTier
+  startDate       DateTime  @default(now())
+  endDate         DateTime
+  isActive        Boolean   @default(true)
+  paymentReference String?
+  
+  user            User      @relation(fields: [userId], references: [id])
+  userId          String    @unique
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("subscriptions")
+}
+
+enum UserRole {
+  MEMBER
+  ADMIN
+  MODERATOR
+}
+
+enum SubTier {
+  FREE
+  PREMIUM_BASIC
+  PREMIUM_PRO
+  ENTERPRISE
+}
+
+enum ListingType {
+  SELL
+  BUY
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  SOLD
+  EXPIRED
+  SUSPENDED
+}
+
+enum PaymentMethod {
+  WAVE
+  ORANGE_MONEY
+  STRIPE
+  BANK_TRANSFER
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum NotificationType {
+  MESSAGE
+  LISTING
+  REVIEW
+  PAYMENT
+  SYSTEM
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint String   @unique
+  p256dh    String
+  auth      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("push_subscriptions")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  title       String
+  message     String
+  type        NotificationType
+  isRead      Boolean          @default(false)
+  userId      String
+  user        User             @relation(fields: [userId], references: [id])
+  relatedId  String?
+  relatedType String?
+  createdAt   DateTime         @default(now())
+  @@map("notifications")
+}
+
+model NotificationPreferences {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id])
+  emailEnabled        Boolean  @default(true)
+  pushEnabled         Boolean  @default(true)
+  emailNewMessages    Boolean  @default(true)
+  emailNewListings    Boolean  @default(false)
+  emailNewReviews     Boolean  @default(true)
+  emailPaymentUpdates Boolean  @default(true)
+  pushNewMessages     Boolean  @default(true)
+  pushNewListings     Boolean  @default(false)
+  pushNewReviews      Boolean  @default(true)
+  pushPaymentUpdates  Boolean  @default(true)
+  updatedAt           DateTime @updatedAt
+  @@map("notification_preferences")
+}
+

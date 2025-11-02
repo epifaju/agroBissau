@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Loader2 } from 'lucide-react';
@@ -23,6 +24,8 @@ export function ContactSellerButton({
   variant = 'default',
   size = 'default',
 }: ContactSellerButtonProps) {
+  const t = useTranslations('listing');
+  const tCommon = useTranslations('common');
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const [contacting, setContacting] = useState(false);
@@ -47,7 +50,7 @@ export function ContactSellerButton({
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.error || 'Erreur lors du contact du vendeur');
+        alert(data.error || t('contactError'));
         return;
       }
 
@@ -59,7 +62,7 @@ export function ContactSellerButton({
       }
     } catch (error) {
       console.error('Error contacting seller:', error);
-      alert('Erreur lors du contact du vendeur. Veuillez réessayer.');
+      alert(t('contactErrorRetry'));
     } finally {
       setContacting(false);
     }
@@ -74,7 +77,7 @@ export function ContactSellerButton({
         disabled
       >
         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-        Chargement...
+        {tCommon('loading')}
       </Button>
     );
   }
@@ -90,12 +93,12 @@ export function ContactSellerButton({
       {contacting ? (
         <>
           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          Contact...
+          {t('contacting')}
         </>
       ) : (
         <>
           <MessageCircle className="w-4 h-4 mr-2" />
-          Contacter le vendeur
+          {t('contactSeller')}
         </>
       )}
     </Button>

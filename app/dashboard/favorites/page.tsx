@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Header } from '@/components/layout/Header';
 import { ListingCard } from '@/components/features/ListingCard';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,6 +31,8 @@ interface Favorite {
 }
 
 export default function FavoritesPage() {
+  const t = useTranslations('dashboard.favorites');
+  const tCommon = useTranslations('common');
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [favorites, setFavorites] = useState<Favorite[]>([]);
@@ -69,7 +72,7 @@ export default function FavoritesPage() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div>Chargement...</div>
+        <div>{tCommon('loading')}</div>
       </div>
     );
   }
@@ -86,12 +89,14 @@ export default function FavoritesPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Heart className="w-8 h-8 text-red-500 fill-red-500" />
-            Mes favoris
+            {t('title')}
           </h1>
           <p className="text-gray-600 mt-2">
             {favorites.length === 0
-              ? 'Vous n\'avez pas encore d\'annonces favorites'
-              : `${favorites.length} annonce${favorites.length > 1 ? 's' : ''} sauvegardée${favorites.length > 1 ? 's' : ''}`
+              ? t('noFavorites')
+              : favorites.length === 1
+              ? t('oneFavorite')
+              : t('multipleFavorites', { count: favorites.length })
             }
           </p>
         </div>
@@ -101,13 +106,13 @@ export default function FavoritesPage() {
             <CardContent className="p-12 text-center">
               <Heart className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-gray-600 mb-4">
-                Vous n'avez pas encore ajouté d'annonces à vos favoris.
+                {t('empty')}
               </p>
               <a
                 href="/listings"
                 className="text-green-600 hover:text-green-700 underline"
               >
-                Parcourir les annonces
+                {t('browse')}
               </a>
             </CardContent>
           </Card>

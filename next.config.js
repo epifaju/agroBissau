@@ -1,3 +1,7 @@
+const createNextIntlPlugin = require('next-intl/plugin');
+
+const withNextIntl = createNextIntlPlugin('./i18n.ts');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -92,8 +96,8 @@ if (process.env.NODE_ENV === 'production' || process.env.ENABLE_PWA === 'true') 
     ],
   });
 
-  module.exports = withPWA(nextConfig);
+  module.exports = withNextIntl(withPWA(nextConfig));
 } else {
-  module.exports = nextConfig;
+  module.exports = withNextIntl(nextConfig);
 }
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
 import { SearchBar } from '@/components/features/SearchBar';
@@ -11,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 function SearchContent() {
+  const t = useTranslations('search');
+  const tFilters = useTranslations('search.filters');
   const searchParams = useSearchParams();
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,9 +106,9 @@ function SearchContent() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-4">Recherche</h1>
+          <h1 className="text-3xl font-bold mb-4">{t('title')}</h1>
           <SearchBar
-            placeholder="Rechercher des produits..."
+            placeholder={t('placeholder')}
             className="max-w-2xl"
             autoFocus
           />
@@ -122,19 +125,19 @@ function SearchContent() {
             {loading ? (
               <div className="text-center py-12">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                <p className="mt-4 text-gray-600">Recherche en cours...</p>
+                <p className="mt-4 text-gray-600">{tFilters('loading')}</p>
               </div>
             ) : listings.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center">
                   <p className="text-lg text-gray-600 mb-4">
                     {hasFilters
-                      ? 'Aucun résultat trouvé pour votre recherche.'
-                      : 'Commencez par saisir un terme de recherche ou utiliser les filtres.'}
+                      ? tFilters('noResults')
+                      : tFilters('startSearch')}
                   </p>
                   {hasFilters && (
                     <Button variant="outline" onClick={() => window.location.href = '/search'}>
-                      Réinitialiser la recherche
+                      {tFilters('resetSearch')}
                     </Button>
                   )}
                 </CardContent>
@@ -145,11 +148,10 @@ function SearchContent() {
                   <p className="text-gray-600">
                     {pagination.total > 0 ? (
                       <>
-                        {pagination.total} résultat{pagination.total > 1 ? 's' : ''} trouvé
-                        {pagination.total > 1 ? 's' : ''}
+                        {pagination.total} {pagination.total > 1 ? tFilters('resultsFoundPlural') : tFilters('resultsFound')}
                       </>
                     ) : (
-                      `${listings.length} résultat${listings.length > 1 ? 's' : ''}`
+                      `${listings.length} ${listings.length > 1 ? tFilters('resultsFoundPlural') : tFilters('resultsFound')}`
                     )}
                   </p>
                 </div>
@@ -184,11 +186,11 @@ function SearchContent() {
                       onClick={() => handlePageChange(pagination.page - 1)}
                       disabled={pagination.page === 1}
                     >
-                      Précédent
+                      {tFilters('previous')}
                     </Button>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-gray-600">
-                        Page {pagination.page} sur {pagination.totalPages}
+                        {tFilters('page')} {pagination.page} {tFilters('of')} {pagination.totalPages}
                       </span>
                     </div>
                     <Button
@@ -196,7 +198,7 @@ function SearchContent() {
                       onClick={() => handlePageChange(pagination.page + 1)}
                       disabled={pagination.page >= pagination.totalPages}
                     >
-                      Suivant
+                      {tFilters('next')}
                     </Button>
                   </div>
                 )}

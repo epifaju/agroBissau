@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { formatPrice, formatDate } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -56,24 +57,25 @@ export async function generateMetadata({
 }: {
   params: { id: string };
 }): Promise<Metadata> {
+  const t = await getTranslations('listing');
   const listing = await getListing(params.id);
 
   if (!listing) {
     return {
-      title: 'Annonce non trouvée',
+      title: t('notFound'),
     };
   }
 
   const url = getAbsoluteUrl(`/listings/${listing.id}`);
-  const imageUrl = listing.images && listing.images.length > 0 
-    ? listing.images[0] 
-    : getAbsoluteUrl('/og-image.png');
+  // Use dynamic OG image endpoint
+  const imageUrl = getAbsoluteUrl(`/api/og/${listing.id}`);
   
+  const tCommon = await getTranslations('common');
   const description = listing.description 
     ? listing.description.substring(0, 160).replace(/\n/g, ' ') + '...'
-    : `Découvrez ${listing.title} sur AgroBissau - ${formatPrice(listing.price)}/${listing.unit}`;
+    : t('discover', { title: listing.title, price: formatPrice(listing.price), unit: listing.unit, appName: tCommon('appName') });
 
-  const title = `${listing.title} - ${formatPrice(listing.price)}/${listing.unit} | AgroBissau`;
+  const title = `${listing.title} - ${formatPrice(listing.price)}/${listing.unit} | ${tCommon('appName')}`;
 
   return {
     title,
@@ -108,13 +110,14 @@ export default async function ListingDetailPage({
 }: {
   params: { id: string };
 }) {
+  const t = await getTranslations('listing');
   const listing = await getListing(params.id);
 
   if (!listing) {
     notFound();
   }
 
-  const locationText = (listing.location as any)?.city || 'Localisation non spécifiée';
+  const locationText = (listing.location as any)?.city || t('locationNotSpecified');
   const userInitials = `${listing.user.firstName[0]}${listing.user.lastName[0]}`;
   
   const isPromotion = isPromotionActive({
@@ -156,7 +159,7 @@ export default async function ListingDetailPage({
             <div>
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <Badge variant="secondary">{listing.category.name}</Badge>
-                {listing.isFeatured && <Badge>Featured</Badge>}
+                {listing.isFeatured && <Badge>{t('featured')}</Badge>}
                 {isPromotion && priceInfo.percent > 0 && (
                   <DiscountBadge discountPercent={priceInfo.percent} size="md" />
                 )}
@@ -175,7 +178,10 @@ export default async function ListingDetailPage({
                       {formatPrice(priceInfo.original)} / {listing.unit}
                     </p>
                     <p className="text-sm text-gray-600">
-                      Économisez {formatPrice(priceInfo.original - priceInfo.discounted)} ({priceInfo.percent}% de réduction)
+                      {t('saveAmount', { 
+                        amount: formatPrice(priceInfo.original - priceInfo.discounted),
+                        percent: priceInfo.percent 
+                      })}
                     </p>
                   </div>
                 ) : (
@@ -185,7 +191,7 @@ export default async function ListingDetailPage({
                 )}
               </div>
               <p className="text-gray-600 mb-2">
-                Quantité disponible: <span className="font-semibold">{listing.quantity} {listing.unit}</span>
+                {t('availableQuantity')}: <span className="font-semibold">{listing.quantity} {listing.unit}</span>
               </p>
               <p className="text-gray-600">
                 📍 {locationText}
@@ -194,7 +200,7 @@ export default async function ListingDetailPage({
 
             <Card>
               <CardContent className="p-6">
-                <h2 className="font-semibold mb-4">Description</h2>
+                <h2 className="font-semibold mb-4">{t('description')}</h2>
                 <p className="text-gray-700 whitespace-pre-wrap">{listing.description}</p>
               </CardContent>
             </Card>
@@ -202,7 +208,7 @@ export default async function ListingDetailPage({
             {/* Map */}
             <Card>
               <CardContent className="p-6">
-                <h2 className="font-semibold mb-4">Localisation</h2>
+                <h2 className="font-semibold mb-4">{t('location')}</h2>
                 <ListingMap
                   location={listing.location as any}
                   title={listing.title}
@@ -225,12 +231,12 @@ export default async function ListingDetailPage({
                     <p className="font-semibold">
                       {listing.user.firstName} {listing.user.lastName}
                     </p>
-                    <p className="text-sm text-gray-600">Vendeur</p>
+                    <p className="text-sm text-gray-600">{t('seller')}</p>
                   </div>
                 </Link>
                 <Link href={`/profile/${listing.user.id}`}>
                   <Button variant="outline" className="w-full mb-2">
-                    Voir le profil
+                    {t('viewProfile')}
                   </Button>
                 </Link>
                 <div className="space-y-2">
@@ -265,7 +271,7 @@ export default async function ListingDetailPage({
             </Card>
 
             <div className="text-sm text-gray-500">
-              Publié le {formatDate(listing.createdAt)}
+              {t('publishedOn')} {formatDate(listing.createdAt)}
             </div>
           </div>
         </div>

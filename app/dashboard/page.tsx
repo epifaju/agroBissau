@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -35,6 +36,8 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
+  const t = useTranslations('dashboard');
+  const tNav = useTranslations('nav');
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -72,7 +75,7 @@ export default function DashboardPage() {
   if (isLoading || loadingStats) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div>Chargement...</div>
+        <div>{t('loading')}</div>
       </div>
     );
   }
@@ -97,7 +100,7 @@ export default function DashboardPage() {
             🌾 AgroBissau
           </Link>
           <nav className="flex gap-4 items-center">
-            <Link href="/listings">Annonces</Link>
+            <Link href="/listings">{tNav('listings')}</Link>
             <span className="text-gray-600">{user?.name || user?.email}</span>
           </nav>
         </div>
@@ -105,96 +108,96 @@ export default function DashboardPage() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Tableau de bord</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <Link 
             href="/dashboard/analytics"
             className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
           >
             <TrendingUp className="w-4 h-4 mr-2" />
-            Voir les analytics
+            {t('actions.viewAnalytics')}
           </Link>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Mes annonces</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('overview.myListings')}</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{overview.listings.total}</div>
               <p className="text-xs text-muted-foreground">
-                {overview.listings.active} actives • {overview.listings.recent} créées (7j)
+                {overview.listings.active} {t('stats.active')} • {overview.listings.recent} {t('stats.created7d')}
               </p>
               <Link 
                 href="/dashboard/listings"
                 className="mt-2 text-green-600 underline-offset-4 hover:underline text-sm"
               >
-                Voir toutes mes annonces →
+                {t('actions.viewAllListings')} →
               </Link>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Messages</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('overview.messages')}</CardTitle>
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{overview.messages.total}</div>
               <p className="text-xs text-muted-foreground">
-                {overview.messages.unread} non lus
+                {overview.messages.unread} {t('stats.unread')}
               </p>
               <Link 
                 href="/dashboard/messages"
                 className="mt-2 text-green-600 underline-offset-4 hover:underline text-sm"
               >
-                Voir mes messages →
+                {t('actions.viewAllMessages')} →
               </Link>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Vues totales</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('overview.totalViews')}</CardTitle>
               <Eye className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{overview.views.total}</div>
               <p className="text-xs text-muted-foreground">
-                {overview.views.last7Days} (7j) • {overview.views.last30Days} (30j)
+                {overview.views.last7Days} {t('stats.days7')} • {overview.views.last30Days} {t('stats.days30')}
               </p>
               <Link 
                 href="/dashboard/analytics"
                 className="mt-2 text-green-600 underline-offset-4 hover:underline text-sm"
               >
-                Voir les détails →
+                {t('actions.viewDetails')} →
               </Link>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Contacts reçus</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('overview.contacts')}</CardTitle>
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{overview.contacts.total}</div>
               <p className="text-xs text-muted-foreground">
-                {overview.contacts.last7Days} (7j) • {overview.contacts.last30Days} (30j)
+                {overview.contacts.last7Days} {t('stats.days7')} • {overview.contacts.last30Days} {t('stats.days30')}
               </p>
               <Link 
                 href="/dashboard/analytics"
                 className="mt-2 text-green-600 underline-offset-4 hover:underline text-sm"
               >
-                Voir les détails →
+                {t('actions.viewDetails')} →
               </Link>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Abonnement</CardTitle>
+              <CardTitle>{t('overview.subscription')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold mb-2">
@@ -202,7 +205,7 @@ export default function DashboardPage() {
               </p>
               <Link href="/dashboard/subscription">
                 <Button variant="link" className="mt-2">
-                  Gérer mon abonnement →
+                  {t('actions.manageSubscription')} →
                 </Button>
               </Link>
             </CardContent>
@@ -212,16 +215,16 @@ export default function DashboardPage() {
             <Card className="border-red-300 bg-red-50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <span className="text-red-600">⚙️ Administration</span>
+                  <span className="text-red-600">⚙️ {t('admin.title')}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-600 mb-4">
-                  Accédez au panneau d'administration pour gérer la plateforme
+                  {t('admin.description')}
                 </p>
                 <Link href="/admin">
                   <Button variant="destructive" className="w-full">
-                    Accéder au Back-office
+                    {t('actions.accessAdmin')}
                   </Button>
                 </Link>
               </CardContent>
@@ -231,30 +234,30 @@ export default function DashboardPage() {
 
         <div className="flex gap-4 flex-wrap">
           <Link href="/listings/create">
-            <Button size="lg">Créer une annonce</Button>
+            <Button size="lg">{t('actions.createListing')}</Button>
           </Link>
           <Link 
             href="/dashboard/alerts"
             className="inline-flex items-center justify-center h-11 rounded-md px-6 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
           >
-            🔔 Alertes de recherche
+            🔔 {t('actions.viewAlerts')}
           </Link>
           <Link 
             href="/dashboard/favorites"
             className="inline-flex items-center justify-center h-11 rounded-md px-6 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
           >
-            ❤️ Mes favoris
+            ❤️ {t('actions.viewFavorites')}
           </Link>
           <Link 
             href="/dashboard/export"
             className="inline-flex items-center justify-center h-11 rounded-md px-6 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
           >
-            📥 Exporter mes données
+            📥 {t('actions.exportData')}
           </Link>
           {(user as any)?.role === 'ADMIN' && (
             <Link href="/admin">
               <Button size="lg" variant="destructive">
-                Accéder au Back-office
+                {t('actions.accessAdmin')}
               </Button>
             </Link>
           )}

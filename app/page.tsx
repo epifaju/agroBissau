@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Header } from '@/components/layout/Header';
 import { ListingCard } from '@/components/features/ListingCard';
 import { prisma } from '@/lib/db';
+import { getTranslations } from 'next-intl/server';
 
 async function getFeaturedListings() {
   try {
@@ -132,6 +133,9 @@ async function getGlobalStats() {
 }
 
 export default async function HomePage() {
+  const t = await getTranslations('home');
+  const tCommon = await getTranslations('common');
+  
   const featuredListings = await getFeaturedListings();
   const featuredIds = featuredListings.map((l) => l.id);
   
@@ -148,25 +152,24 @@ export default async function HomePage() {
       <section className="bg-gradient-to-b from-green-50 to-white py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Marketplace Agroalimentaire
-            <span className="text-green-600 block mt-2">en Guinée-Bissau</span>
+            {t('title')}
+            <span className="text-green-600 block mt-2">{t('titleSub')}</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Connectez producteurs, vendeurs, acheteurs et exportateurs agricoles
-            sur une plateforme moderne et sécurisée.
+            {t('subtitle')}
           </p>
           <div className="flex gap-4 justify-center">
             <Link 
               href="/register"
               className="inline-flex items-center justify-center h-11 rounded-md px-8 bg-green-600 text-white hover:bg-green-700 text-sm font-medium transition-colors"
             >
-              Commencer gratuitement
+              {t('cta')}
             </Link>
             <Link 
               href="/listings"
               className="inline-flex items-center justify-center h-11 rounded-md px-8 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
             >
-              Voir les annonces
+              {t('ctaSecondary')}
             </Link>
           </div>
         </div>
@@ -176,12 +179,12 @@ export default async function HomePage() {
       {featuredListings.length > 0 && (
         <section className="py-20 container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold">Annonces en vedette</h2>
+            <h2 className="text-3xl font-bold">{t('featured')}</h2>
             <Link 
               href="/listings"
               className="inline-flex items-center justify-center h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors"
             >
-              Voir toutes les annonces
+              {t('viewAllListings')}
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -197,12 +200,12 @@ export default async function HomePage() {
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-bold">Dernières annonces</h2>
+              <h2 className="text-3xl font-bold">{t('latest')}</h2>
               <Link 
                 href="/listings"
                 className="inline-flex items-center justify-center h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors"
               >
-                Voir toutes les annonces
+                {t('viewAllListings')}
               </Link>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -222,17 +225,17 @@ export default async function HomePage() {
               <div className="text-4xl font-bold mb-2">
                 {globalStats.totalListings.toLocaleString('fr-FR')}
               </div>
-              <p className="text-green-100">Annonces actives</p>
+              <p className="text-green-100">{t('stats.activeListings')}</p>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">
                 {globalStats.totalUsers.toLocaleString('fr-FR')}
               </div>
-              <p className="text-green-100">Utilisateurs actifs</p>
+              <p className="text-green-100">{t('stats.activeUsers')}</p>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">100%</div>
-              <p className="text-green-100">Satisfaction client</p>
+              <p className="text-green-100">{t('stats.satisfaction')}</p>
             </div>
           </div>
         </div>
@@ -241,33 +244,33 @@ export default async function HomePage() {
       {/* Features */}
       <section className="py-20 container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-12">
-          Pourquoi choisir AgroBissau?
+          {t('features.title')}
         </h2>
         <div className="grid md:grid-cols-3 gap-8">
           <Card>
             <CardContent className="pt-6">
               <div className="text-4xl mb-4">🌱</div>
-              <h3 className="text-xl font-semibold mb-2">Produits locaux</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('features.local.title')}</h3>
               <p className="text-gray-600">
-                Connectez-vous directement avec les producteurs locaux pour des produits frais et authentiques.
+                {t('features.local.description')}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
               <div className="text-4xl mb-4">💳</div>
-              <h3 className="text-xl font-semibold mb-2">Paiements locaux</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('features.payments.title')}</h3>
               <p className="text-gray-600">
-                Payez facilement avec Wave Money et Orange Money, les solutions de paiement les plus utilisées.
+                {t('features.payments.description')}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
               <div className="text-4xl mb-4">📱</div>
-              <h3 className="text-xl font-semibold mb-2">Application mobile</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('features.mobile.title')}</h3>
               <p className="text-gray-600">
-                Utilisez AgroBissau comme une application native sur votre téléphone avec notre PWA.
+                {t('features.mobile.description')}
               </p>
             </CardContent>
           </Card>
@@ -277,15 +280,15 @@ export default async function HomePage() {
       {/* CTA */}
       <section className="bg-green-600 text-white py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Prêt à commencer?</h2>
+          <h2 className="text-3xl font-bold mb-4">{t('ctaSection.title')}</h2>
           <p className="text-green-100 mb-8">
-            Rejoignez des centaines d'utilisateurs sur AgroBissau
+            {t('ctaSection.description')}
           </p>
           <Link 
             href="/register"
             className="inline-flex items-center justify-center h-11 rounded-md px-8 bg-gray-200 text-gray-900 hover:bg-gray-300 text-sm font-medium transition-colors"
           >
-            Créer un compte gratuit
+            {t('ctaSection.button')}
           </Link>
         </div>
       </section>
@@ -293,7 +296,7 @@ export default async function HomePage() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8">
         <div className="container mx-auto px-4 text-center">
-          <p>&copy; 2025 AgroBissau. Tous droits réservés.</p>
+          <p>{t('footer.copyright')}</p>
         </div>
       </footer>
     </div>

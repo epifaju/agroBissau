@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -46,6 +47,7 @@ export function ChatWindow({
   otherUser,
   initialMessages = [],
 }: ChatWindowProps) {
+  const t = useTranslations('dashboard.messages');
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
@@ -204,9 +206,9 @@ export function ChatWindow({
               {otherUser.firstName} {otherUser.lastName}
             </p>
             {isConnected ? (
-              <p className="text-xs text-green-600">En ligne</p>
+              <p className="text-xs text-green-600">{t('online')}</p>
             ) : (
-              <p className="text-xs text-gray-400">Hors ligne</p>
+              <p className="text-xs text-gray-400">{t('offline')}</p>
             )}
           </div>
         </div>
@@ -216,7 +218,7 @@ export function ChatWindow({
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 py-8">
-            <p>Aucun message. Commencez la conversation !</p>
+            <p>{t('noMessages')}</p>
           </div>
         ) : (
           messages.map((message) => {
@@ -278,7 +280,7 @@ export function ChatWindow({
             value={input}
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Tapez votre message..."
+            placeholder={t('typeMessage')}
             className="min-h-[60px] max-h-[120px] resize-none"
             disabled={!isConnected || sending}
           />

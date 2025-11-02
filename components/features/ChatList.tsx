@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,6 +34,7 @@ export function ChatList({
   onSelectConversation,
   selectedUserId,
 }: ChatListProps) {
+  const t = useTranslations('dashboard.messages');
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -129,8 +131,8 @@ export function ChatList({
   if (conversations.length === 0) {
     return (
       <div className="p-8 text-center text-gray-500">
-        <p>Aucune conversation</p>
-        <p className="text-sm mt-2">Commencez à discuter avec un vendeur !</p>
+        <p>{t('noConversations')}</p>
+        <p className="text-sm mt-2">{t('noConversationsDescription')}</p>
       </div>
     );
   }
@@ -178,7 +180,7 @@ export function ChatList({
                             : 'text-gray-600'
                         }`}
                       >
-                        {isLastMessageFromOther && 'Vous: '}
+                        {isLastMessageFromOther && t('you')}
                         {conversation.lastMessage.content}
                       </p>
                       {conversation.lastMessage && (

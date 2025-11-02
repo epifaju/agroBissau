@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,6 +30,9 @@ interface Category {
 }
 
 export default function AlertsPage() {
+  const t = useTranslations('dashboard.alerts');
+  const tCommon = useTranslations('common');
+  const tFilters = useTranslations('search.filters');
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [alerts, setAlerts] = useState<SearchAlert[]>([]);
@@ -115,11 +119,11 @@ export default function AlertsPage() {
         resetForm();
       } else {
         const data = await response.json();
-        alert(data.error || 'Erreur lors de la sauvegarde');
+        alert(data.error || t('saveError'));
       }
     } catch (error) {
       console.error('Error saving alert:', error);
-      alert('Erreur lors de la sauvegarde de l\'alerte');
+      alert(t('saveError'));
     }
   };
 
@@ -139,7 +143,7 @@ export default function AlertsPage() {
   };
 
   const handleDelete = async (alertId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette alerte ?')) {
+    if (!confirm(t('deleteConfirm'))) {
       return;
     }
 
@@ -151,11 +155,11 @@ export default function AlertsPage() {
       if (response.ok) {
         await fetchAlerts();
       } else {
-        alert('Erreur lors de la suppression');
+        alert(t('deleteError'));
       }
     } catch (error) {
       console.error('Error deleting alert:', error);
-      alert('Erreur lors de la suppression');
+      alert(t('deleteError'));
     }
   };
 
@@ -192,7 +196,7 @@ export default function AlertsPage() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div>Chargement...</div>
+        <div>{tCommon('loading')}</div>
       </div>
     );
   }
@@ -208,15 +212,15 @@ export default function AlertsPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Alertes de recherche</h1>
+            <h1 className="text-3xl font-bold">{t('title')}</h1>
             <p className="text-gray-600 mt-2">
-              Créez des alertes pour être notifié des nouvelles annonces correspondant à vos critères
+              {t('description')}
             </p>
           </div>
           {!showForm && (
             <Button onClick={() => setShowForm(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              Créer une alerte
+              {t('create')}
             </Button>
           )}
         </div>
@@ -226,31 +230,31 @@ export default function AlertsPage() {
           <Card className="mb-8">
             <CardHeader>
               <CardTitle>
-                {editingAlert ? 'Modifier l\'alerte' : 'Nouvelle alerte'}
+                {editingAlert ? t('editTitle') : t('newTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <Label htmlFor="title">Titre de l'alerte *</Label>
+                  <Label htmlFor="title">{t('titleLabel')} *</Label>
                   <Input
                     id="title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Ex: Riz Bissau moins de 5000 FCFA"
+                    placeholder={t('titlePlaceholder')}
                     required
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="category">Catégorie</Label>
-                    <Select value={categoryId} onValueChange={setCategoryId}>
+                    <Label htmlFor="category">{tFilters('category')}</Label>
+                    <Select value={categoryId || 'all'} onValueChange={(v) => setCategoryId(v === 'all' ? '' : v)}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Toutes les catégories" />
+                        <SelectValue placeholder={tFilters('allCategories')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Toutes les catégories</SelectItem>
+                        <SelectItem value="all">{tFilters('allCategories')}</SelectItem>
                         {categories.map((cat) => (
                           <SelectItem key={cat.id} value={cat.id}>
                             {cat.name}
@@ -261,41 +265,41 @@ export default function AlertsPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="city">Ville</Label>
+                    <Label htmlFor="city">{tFilters('city')}</Label>
                     <Input
                       id="city"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      placeholder="Ex: Bissau"
+                      placeholder={t('cityPlaceholder')}
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="type">Type</Label>
-                    <Select value={type} onValueChange={(v) => setType(v as any)}>
+                    <Label htmlFor="type">{tFilters('type')}</Label>
+                    <Select value={type || 'all'} onValueChange={(v) => setType(v === 'all' ? '' : (v as any))}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Tous les types" />
+                        <SelectValue placeholder={tFilters('allTypes')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Tous les types</SelectItem>
-                        <SelectItem value="SELL">Vente</SelectItem>
-                        <SelectItem value="BUY">Achat</SelectItem>
+                        <SelectItem value="all">{tFilters('allTypes')}</SelectItem>
+                        <SelectItem value="SELL">{tFilters('typeSell')}</SelectItem>
+                        <SelectItem value="BUY">{tFilters('typeBuy')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div>
-                    <Label htmlFor="frequency">Fréquence de notification *</Label>
+                    <Label htmlFor="frequency">{t('frequencyLabel')} *</Label>
                     <Select value={frequency} onValueChange={(v) => setFrequency(v as any)} required>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="daily">Quotidienne</SelectItem>
-                        <SelectItem value="weekly">Hebdomadaire</SelectItem>
-                        <SelectItem value="instant">Instantanée</SelectItem>
+                        <SelectItem value="daily">{t('frequencyDaily')}</SelectItem>
+                        <SelectItem value="weekly">{t('frequencyWeekly')}</SelectItem>
+                        <SelectItem value="instant">{t('frequencyInstant')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -303,34 +307,34 @@ export default function AlertsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="minPrice">Prix minimum (FCFA)</Label>
+                    <Label htmlFor="minPrice">{tFilters('minPrice')}</Label>
                     <Input
                       id="minPrice"
                       type="number"
                       value={minPrice}
                       onChange={(e) => setMinPrice(e.target.value)}
-                      placeholder="Ex: 1000"
+                      placeholder={t('pricePlaceholder')}
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="maxPrice">Prix maximum (FCFA)</Label>
+                    <Label htmlFor="maxPrice">{tFilters('maxPrice')}</Label>
                     <Input
                       id="maxPrice"
                       type="number"
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(e.target.value)}
-                      placeholder="Ex: 10000"
+                      placeholder={t('pricePlaceholder')}
                     />
                   </div>
                 </div>
 
                 <div className="flex gap-2">
                   <Button type="submit">
-                    {editingAlert ? 'Mettre à jour' : 'Créer l\'alerte'}
+                    {editingAlert ? t('update') : t('createButton')}
                   </Button>
                   <Button type="button" variant="outline" onClick={resetForm}>
-                    Annuler
+                    {t('cancel')}
                   </Button>
                 </div>
               </form>
@@ -344,11 +348,11 @@ export default function AlertsPage() {
             <CardContent className="p-12 text-center">
               <Bell className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-gray-600 mb-4">
-                Vous n'avez pas encore créé d'alerte de recherche.
+                {t('empty')}
               </p>
               <Button onClick={() => setShowForm(true)}>
                 <Plus className="w-4 h-4 mr-2" />
-                Créer ma première alerte
+                {t('createFirst')}
               </Button>
             </CardContent>
           </Card>
@@ -366,34 +370,34 @@ export default function AlertsPage() {
                           {alert.isActive ? (
                             <Badge className="bg-green-100 text-green-800">
                               <Check className="w-3 h-3 mr-1" />
-                              Active
+                              {t('active')}
                             </Badge>
                           ) : (
                             <Badge variant="secondary">
                               <X className="w-3 h-3 mr-1" />
-                              Inactive
+                              {t('inactive')}
                             </Badge>
                           )}
                           <Badge variant="outline">
-                            {alert.frequency === 'daily' && 'Quotidienne'}
-                            {alert.frequency === 'weekly' && 'Hebdomadaire'}
-                            {alert.frequency === 'instant' && 'Instantanée'}
+                            {alert.frequency === 'daily' && t('frequencyDaily')}
+                            {alert.frequency === 'weekly' && t('frequencyWeekly')}
+                            {alert.frequency === 'instant' && t('frequencyInstant')}
                           </Badge>
                         </div>
                         <div className="text-sm text-gray-600 space-y-1">
                           {criteria.categoryId && (
-                            <p>Catégorie: {categories.find(c => c.id === criteria.categoryId)?.name || criteria.categoryId}</p>
+                            <p>{tFilters('category')}: {categories.find(c => c.id === criteria.categoryId)?.name || criteria.categoryId}</p>
                           )}
-                          {criteria.city && <p>Ville: {criteria.city}</p>}
-                          {criteria.type && <p>Type: {criteria.type === 'SELL' ? 'Vente' : 'Achat'}</p>}
+                          {criteria.city && <p>{tFilters('city')}: {criteria.city}</p>}
+                          {criteria.type && <p>{tFilters('type')}: {criteria.type === 'SELL' ? tFilters('typeSell') : tFilters('typeBuy')}</p>}
                           {(criteria.minPrice || criteria.maxPrice) && (
                             <p>
-                              Prix: {criteria.minPrice ? `${criteria.minPrice.toLocaleString()} FCFA` : '0'} - {criteria.maxPrice ? `${criteria.maxPrice.toLocaleString()} FCFA` : '∞'}
+                              {t('priceLabel')}: {criteria.minPrice ? `${criteria.minPrice.toLocaleString()} FCFA` : '0'} - {criteria.maxPrice ? `${criteria.maxPrice.toLocaleString()} FCFA` : '∞'}
                             </p>
                           )}
                           {alert.lastNotifiedAt && (
                             <p className="text-xs text-gray-500 mt-2">
-                              Dernière notification: {new Date(alert.lastNotifiedAt).toLocaleDateString('fr-FR')}
+                              {t('lastNotification')}: {new Date(alert.lastNotifiedAt).toLocaleDateString('fr-FR')}
                             </p>
                           )}
                         </div>
@@ -404,7 +408,7 @@ export default function AlertsPage() {
                           size="sm"
                           onClick={() => handleToggle(alert)}
                         >
-                          {alert.isActive ? 'Désactiver' : 'Activer'}
+                          {alert.isActive ? t('deactivate') : t('activate')}
                         </Button>
                         <Button
                           variant="outline"

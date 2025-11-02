@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -44,6 +45,7 @@ const cities = [
 ];
 
 export function SearchFilters({ onFiltersChange, showCard = true }: SearchFiltersProps) {
+  const t = useTranslations('search.filters');
   const router = useRouter();
   const searchParams = useSearchParams();
   const [categories, setCategories] = useState<Category[]>([]);
@@ -120,16 +122,16 @@ export function SearchFilters({ onFiltersChange, showCard = true }: SearchFilter
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="category">Catégorie</Label>
+          <Label htmlFor="category">{t('category')}</Label>
           <Select
             value={filters.category || 'all'}
             onValueChange={(value) => updateFilters({ category: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Toutes les catégories" />
+              <SelectValue placeholder={t('allCategories')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Toutes les catégories</SelectItem>
+              <SelectItem value="all">{t('allCategories')}</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category.id} value={category.id}>
                   {category.name}
@@ -140,16 +142,16 @@ export function SearchFilters({ onFiltersChange, showCard = true }: SearchFilter
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="city">Ville</Label>
+          <Label htmlFor="city">{t('city')}</Label>
           <Select
             value={filters.city || 'all'}
             onValueChange={(value) => updateFilters({ city: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Toutes les villes" />
+              <SelectValue placeholder={t('allCities')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Toutes les villes</SelectItem>
+              <SelectItem value="all">{t('allCities')}</SelectItem>
               {cities.map((city) => (
                 <SelectItem key={city} value={city.toLowerCase()}>
                   {city}
@@ -160,24 +162,24 @@ export function SearchFilters({ onFiltersChange, showCard = true }: SearchFilter
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="type">Type</Label>
+          <Label htmlFor="type">{t('type')}</Label>
           <Select
             value={filters.type || 'all'}
             onValueChange={(value) => updateFilters({ type: value === 'all' ? undefined : (value as 'SELL' | 'BUY') })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Tous les types" />
+              <SelectValue placeholder={t('allTypes')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tous les types</SelectItem>
-              <SelectItem value="SELL">Vente</SelectItem>
-              <SelectItem value="BUY">Achat</SelectItem>
+              <SelectItem value="all">{t('allTypes')}</SelectItem>
+              <SelectItem value="SELL">{t('typeSell')}</SelectItem>
+              <SelectItem value="BUY">{t('typeBuy')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="sort">Trier par</Label>
+          <Label htmlFor="sort">{t('sortBy')}</Label>
           <Select
             value={filters.sortBy || 'newest'}
             onValueChange={(value) => updateFilters({ sortBy: value as any })}
@@ -186,16 +188,16 @@ export function SearchFilters({ onFiltersChange, showCard = true }: SearchFilter
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="newest">Plus récent</SelectItem>
-              <SelectItem value="oldest">Plus ancien</SelectItem>
-              <SelectItem value="price_asc">Prix croissant</SelectItem>
-              <SelectItem value="price_desc">Prix décroissant</SelectItem>
+              <SelectItem value="newest">{t('sortNewest')}</SelectItem>
+              <SelectItem value="oldest">{t('sortOldest')}</SelectItem>
+              <SelectItem value="price_asc">{t('sortPriceAsc')}</SelectItem>
+              <SelectItem value="price_desc">{t('sortPriceDesc')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="minPrice">Prix minimum (CFA)</Label>
+          <Label htmlFor="minPrice">{t('minPrice')}</Label>
           <Input
             id="minPrice"
             type="number"
@@ -206,11 +208,11 @@ export function SearchFilters({ onFiltersChange, showCard = true }: SearchFilter
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="maxPrice">Prix maximum (CFA)</Label>
+          <Label htmlFor="maxPrice">{t('maxPrice')}</Label>
           <Input
             id="maxPrice"
             type="number"
-            placeholder="Aucun maximum"
+            placeholder={t('noMaxPrice')}
             value={filters.maxPrice}
             onChange={(e) => updateFilters({ maxPrice: e.target.value })}
           />
@@ -226,7 +228,7 @@ export function SearchFilters({ onFiltersChange, showCard = true }: SearchFilter
           className="h-4 w-4 text-green-600 rounded"
         />
         <Label htmlFor="promotion" className="cursor-pointer">
-          Annonces en promotion uniquement
+          {t('promotionOnly')}
         </Label>
       </div>
 
@@ -234,7 +236,7 @@ export function SearchFilters({ onFiltersChange, showCard = true }: SearchFilter
         <div className="flex justify-end">
           <Button type="button" variant="outline" onClick={resetFilters} size="sm">
             <X className="w-4 h-4 mr-2" />
-            Réinitialiser les filtres
+            {t('reset')}
           </Button>
         </div>
       )}
@@ -251,7 +253,7 @@ export function SearchFilters({ onFiltersChange, showCard = true }: SearchFilter
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Filter className="w-5 h-5" />
-            Filtres de recherche
+            {t('title')}
           </CardTitle>
           <Button
             type="button"
@@ -259,7 +261,7 @@ export function SearchFilters({ onFiltersChange, showCard = true }: SearchFilter
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
           >
-            {showFilters ? 'Masquer' : 'Afficher'}
+            {showFilters ? t('hide') : t('show')}
           </Button>
         </div>
       </CardHeader>

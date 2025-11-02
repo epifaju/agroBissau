@@ -35,6 +35,17 @@ export function ShareButtons({
 }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
   const [fullUrl, setFullUrl] = useState(url);
+  const [shortUrl, setShortUrl] = useState<string | null>(null);
+  const [supportsWebShare, setSupportsWebShare] = useState(false);
+
+  // Check if Web Share API is available
+  useEffect(() => {
+    setSupportsWebShare(
+      typeof navigator !== 'undefined' &&
+      'share' in navigator &&
+      navigator.canShare !== undefined
+    );
+  }, []);
 
   // Ensure we have a full URL (add origin if relative)
   useEffect(() => {
@@ -45,21 +56,73 @@ export function ShareButtons({
     }
   }, [url]);
 
+  // Create short URL when component mounts
+  useEffect(() => {
+    const createShortUrl = async () => {
+      try {
+        const response = await fetch('/api/shorten', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: fullUrl, expiresInDays: 90 }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setShortUrl(data.shortUrl);
+        }
+      } catch (error) {
+        console.error('Error creating short URL:', error);
+      }
+    };
+
+    if (fullUrl && fullUrl.startsWith('http')) {
+      createShortUrl();
+    }
+  }, [fullUrl]);
+
   const shareText = formatShareText(title, description, price);
 
+  const handleNativeShare = async () => {
+    if (!supportsWebShare) return;
+
+    const shareData: ShareData = {
+      title,
+      text: shareText,
+      url: shortUrl || fullUrl,
+    };
+
+    try {
+      if (navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+        
+        // Track analytics
+        trackEvent(EVENTS.LISTING_SHARED, {
+          platform: 'native',
+          listingId,
+          url: shortUrl || fullUrl,
+        });
+      }
+    } catch (error: any) {
+      // User cancelled or error occurred
+      if (error.name !== 'AbortError') {
+        console.error('Error sharing:', error);
+      }
+    }
+  };
+
   const handleShare = async (
-    platform: 'facebook' | 'twitter' | 'whatsapp' | 'copy',
+    platform: 'facebook' | 'twitter' | 'whatsapp' | 'copy' | 'native',
     shareUrl?: string
   ) => {
     // Track analytics
     trackEvent(EVENTS.LISTING_SHARED, {
       platform,
       listingId,
-      url: fullUrl,
+      url: shortUrl || fullUrl,
     });
 
     if (platform === 'copy') {
-      const success = await copyToClipboard(fullUrl);
+      const urlToCopy = shortUrl || fullUrl;
+      const success = await copyToClipboard(urlToCopy);
       if (success) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -67,8 +130,16 @@ export function ShareButtons({
       return;
     }
 
+    if (platform === 'native') {
+      await handleNativeShare();
+      return;
+    }
+
     if (shareUrl) {
-      openShareWindow(shareUrl);
+      // Use short URL in share if available
+      const urlToShare = shortUrl || fullUrl;
+      const shareUrlWithShort = shareUrl.replace(fullUrl, urlToShare);
+      openShareWindow(shareUrlWithShort);
     }
   };
 
@@ -79,6 +150,17 @@ export function ShareButtons({
   if (variant === 'icon-only') {
     return (
       <div className={cn('flex items-center gap-2', className)}>
+        {supportsWebShare && (
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => handleShare('native')}
+            aria-label="Partager"
+            className="h-9 w-9"
+          >
+            <Share2 className="h-4 w-4" />
+          </Button>
+        )}
         <Button
           variant="outline"
           size="icon"
@@ -125,7 +207,18 @@ export function ShareButtons({
 
   if (variant === 'compact') {
     return (
-      <div className={cn('flex items-center gap-2', className)}>
+      <div className={cn('flex items-center gap-2 flex-wrap', className)}>
+        {supportsWebShare && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleShare('native')}
+            className="flex items-center gap-2"
+          >
+            <Share2 className="h-4 w-4" />
+            <span className="hidden sm:inline">Partager</span>
+          </Button>
+        )}
         <Button
           variant="outline"
           size="sm"
@@ -183,6 +276,16 @@ export function ShareButtons({
         <span>Partager cette annonce</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {supportsWebShare && (
+          <Button
+            variant="outline"
+            onClick={() => handleShare('native')}
+            className="flex items-center justify-center gap-2 h-11"
+          >
+            <Share2 className="h-5 w-5" />
+            <span>Partager</span>
+          </Button>
+        )}
         <Button
           variant="outline"
           onClick={() => handleShare('facebook', facebookUrl)}

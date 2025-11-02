@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,13 +16,17 @@ interface SearchBarProps {
 }
 
 export function SearchBar({
-  placeholder = 'Rechercher des produits...',
+  placeholder,
   className,
   onSearch,
   autoFocus = false,
 }: SearchBarProps) {
+  const t = useTranslations('search');
   const router = useRouter();
   const searchParams = useSearchParams();
+  
+  // Use translated placeholder if not provided
+  const searchPlaceholder = placeholder || t('placeholder');
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -95,7 +100,7 @@ export function SearchBar({
           onChange={(e) => handleChange(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          placeholder={placeholder}
+          placeholder={searchPlaceholder}
           className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
           autoFocus={autoFocus}
         />
@@ -111,7 +116,7 @@ export function SearchBar({
           </Button>
         )}
         <Button type="submit" size="sm" className="m-1">
-          Rechercher
+          {t('searchButton')}
         </Button>
       </div>
     </form>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { registerSchema } from '@/lib/validations';
 
 export default function RegisterPage() {
+  const t = useTranslations('auth.register');
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
@@ -38,12 +40,12 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Une erreur est survenue');
+        setError(data.error || t('error.generic'));
       } else {
         router.push('/login?registered=true');
       }
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || 'Une erreur est survenue');
+      setError(err.errors?.[0]?.message || t('error.generic'));
     } finally {
       setLoading(false);
     }
@@ -53,9 +55,9 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Inscription</CardTitle>
+          <CardTitle className="text-2xl text-center">{t('title')}</CardTitle>
           <CardDescription className="text-center">
-            Créez votre compte AgroBissau
+            {t('description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -67,7 +69,7 @@ export default function RegisterPage() {
             )}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">Prénom</Label>
+                <Label htmlFor="firstName">{t('firstName')}</Label>
                 <Input
                   id="firstName"
                   value={formData.firstName}
@@ -76,7 +78,7 @@ export default function RegisterPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Nom</Label>
+                <Label htmlFor="lastName">{t('lastName')}</Label>
                 <Input
                   id="lastName"
                   value={formData.lastName}
@@ -86,7 +88,7 @@ export default function RegisterPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -97,7 +99,7 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Téléphone (optionnel)</Label>
+              <Label htmlFor="phone">{t('phoneOptional')}</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -107,7 +109,7 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -116,14 +118,24 @@ export default function RegisterPage() {
                 required
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                required
+              />
+            </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Inscription...' : 'S\'inscrire'}
+              {loading ? t('submitting') : t('submit')}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            <span className="text-gray-600">Déjà un compte? </span>
+            <span className="text-gray-600">{t('hasAccount')} </span>
             <Link href="/login" className="text-green-600 hover:underline">
-              Se connecter
+              {t('loginLink')}
             </Link>
           </div>
         </CardContent>

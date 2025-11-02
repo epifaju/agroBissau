@@ -103,17 +103,20 @@
 **Manquant :**
 
 - [ ] API route `/api/users/me/dashboard`
+
   - Statistiques : nombre d'annonces, vues, contacts reçus
   - Nombre de messages non lus
   - Évolution dans le temps
   - Annonces les plus populaires (par vues/contacts)
 
 - [ ] API route `/api/users/me/analytics`
+
   - Métriques détaillées avec historique
   - Graphiques de données (recharts ou chart.js)
   - Vue d'évolution des performances
 
 - [ ] Page `/dashboard/analytics`
+
   - Graphiques visuels (vues, contacts, messages)
   - Statistiques par période (7j, 30j, 90j)
   - Top annonces par performance
@@ -126,11 +129,13 @@
   - Liens vers analytics détaillées
 
 **Fichiers à créer :**
+
 - `app/api/users/me/dashboard/route.ts`
 - `app/api/users/me/analytics/route.ts`
 - `app/dashboard/analytics/page.tsx`
 
 **Fichiers à modifier :**
+
 - `app/dashboard/page.tsx` (charger les vraies stats)
 
 **Note** : L'API `/api/users/me/listings` existe déjà mais n'est pas utilisée dans le dashboard.
@@ -145,6 +150,7 @@
 **Manquant :**
 
 - [ ] Afficher les dernières annonces sur la homepage
+
   - Section "Dernières annonces" après les featured
   - Pagination ou "Voir plus"
   - Grid avec `ListingCard`
@@ -155,6 +161,7 @@
   - Catégories populaires
 
 **Fichiers à modifier :**
+
 - `app/page.tsx` (ajouter section dernières annonces)
 
 ---
@@ -181,19 +188,21 @@
     userId      String
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
-    
+
     @@index([userId])
     @@map("search_alerts")
   }
   ```
 
 - [ ] API routes `/api/alerts/*`
+
   - `POST /api/alerts` : Créer une alerte
   - `GET /api/alerts` : Liste des alertes de l'utilisateur
   - `PUT /api/alerts/[id]` : Modifier une alerte
   - `DELETE /api/alerts/[id]` : Supprimer une alerte
 
 - [ ] Page `/dashboard/alerts` ou section dans settings
+
   - Interface pour créer/gérer les alertes
   - Formulaire de critères de recherche (réutiliser `SearchFilters`)
   - Liste des alertes actives avec possibilité d'édition/suppression
@@ -204,6 +213,7 @@
   - Éviter les doublons (déjà notifié pour cette annonce)
 
 **Fichiers à créer :**
+
 - Migration Prisma pour `SearchAlert`
 - `app/api/alerts/route.ts`
 - `app/api/alerts/[id]/route.ts`
@@ -222,11 +232,13 @@
 **Manquant :**
 
 - [ ] Export des annonces utilisateur (CSV/JSON)
+
   - Toutes les annonces avec détails
   - Statistiques par annonce (vues, contacts)
   - Optionnel : Export Excel
 
 - [ ] Export de l'historique des messages
+
   - Conversations complètes
   - Format JSON ou CSV
 
@@ -235,6 +247,7 @@
   - Format CSV pour analyse externe
 
 **Fichiers à créer :**
+
 - `app/api/users/me/export/listings/route.ts`
 - `app/api/users/me/export/messages/route.ts`
 - `app/api/users/me/export/analytics/route.ts`
@@ -251,14 +264,17 @@
 **À vérifier/compléter :**
 
 - [ ] Tests réels des paiements Wave/Orange Money
+
   - Tester en environnement sandbox
   - Valider les callbacks
 
 - [ ] Gestion des erreurs de paiement
+
   - Retry logic
   - Messages d'erreur utilisateur clairs
 
 - [ ] Webhooks de confirmation robustes
+
   - Gestion des timeouts
   - Idempotence (éviter les doublons)
 
@@ -280,18 +296,22 @@
 **Manquant :**
 
 - [ ] Cache des pages visitées
+
   - Mettre en cache les pages principales (homepage, listings)
   - Cache avec invalidation intelligente
 
 - [ ] Cache des API responses
+
   - Cache GET requests avec stratégie de cache appropriée
   - Invalidation lors des mises à jour
 
 - [ ] Page offline (`/offline`)
+
   - Affichage quand pas de connexion
   - Message informatif avec bouton de retry
 
 - [ ] Queue de synchronisation pour actions en attente
+
   - Sauvegarder les actions (création annonce, messages) en local
   - Synchronisation automatique quand connexion retrouvée
 
@@ -311,11 +331,13 @@
 **Manquant :**
 
 - [ ] Tests unitaires des composants
+
   - Composants UI (`Button`, `Input`, `Card`, etc.)
   - Composants features (`ListingCard`, `ReviewCard`, etc.)
   - Hooks personnalisés (`useAuth`, `useSocket`, etc.)
 
 - [ ] Tests d'intégration des API
+
   - Routes d'authentification (`/api/auth/*`)
   - Routes listings (`/api/listings/*`)
   - Routes messages (`/api/messages/*`)
@@ -328,6 +350,7 @@
     - Abonnement → Featured listing
 
 **Fichiers à créer :**
+
 - `__tests__/components/*.test.tsx`
 - `__tests__/api/*.test.ts`
 - `__tests__/e2e/*.test.ts` (optionnel)
@@ -344,6 +367,7 @@
 **Manquant :**
 
 - [ ] Intégrer Google Analytics ou similaire
+
   - Tracking des pages (PageView)
   - Tracking des événements :
     - Création annonce (`listing_created`)
@@ -354,8 +378,12 @@
     - Recherche effectuée (`search_performed`)
 
 - [ ] Créer `lib/analytics.ts`
+
   ```typescript
-  export const trackEvent = (eventName: string, properties?: Record<string, any>) => {
+  export const trackEvent = (
+    eventName: string,
+    properties?: Record<string, any>
+  ) => {
     // Google Analytics, Mixpanel, ou autre
   };
 
@@ -374,9 +402,11 @@
   - Tracking côté client pour performances
 
 **Fichiers à créer :**
+
 - `lib/analytics.ts`
 
 **Fichiers à modifier :**
+
 - Composants et pages pour ajouter tracking
 
 **Estimation :** 2-3 jours
@@ -415,6 +445,7 @@
 ### 🔴 Phase 1 : Finalisation Core (Semaines 1-2)
 
 1. **Dashboard Analytics Utilisateur** (5 jours)
+
    - APIs de statistiques
    - Page analytics avec graphiques
    - Améliorer dashboard principal
@@ -425,11 +456,13 @@
 ### 🟡 Phase 2 : Features Avancées (Semaines 3-4)
 
 3. **SearchAlerts** (4 jours)
+
    - Modèle Prisma
    - APIs et interface
    - Job de notifications
 
 4. **Export de Données** (3 jours)
+
    - APIs d'export (listings, messages, analytics)
 
 5. **Améliorations Paiements** (3 jours)
@@ -439,11 +472,13 @@
 ### 🟢 Phase 3 : Qualité & Optimisations (Semaines 5-7)
 
 6. **Tests Automatisés** (7 jours)
+
    - Tests unitaires composants
    - Tests intégration API
    - Tests E2E optionnels
 
 7. **Analytics & Tracking** (2 jours)
+
    - Intégration Google Analytics
    - Tracking événements
 
@@ -467,6 +502,7 @@ Le dashboard actuel (`/dashboard/page.tsx`) affiche des valeurs statiques ("0").
 ### SearchAlerts
 
 Nouvelle fonctionnalité qui nécessite :
+
 - Ajout du modèle au schema Prisma
 - Migration de base de données
 - APIs CRUD
@@ -476,6 +512,7 @@ Nouvelle fonctionnalité qui nécessite :
 ### Tests
 
 Jest est configuré mais aucun test n'existe. Prioriser :
+
 1. Tests API (plus critique)
 2. Tests composants UI
 3. Tests E2E (optionnel)
@@ -485,4 +522,3 @@ Jest est configuré mais aucun test n'existe. Prioriser :
 **Dernière mise à jour :** 2025-01-17  
 **Version :** 2.0  
 **Status :** Analyse complète basée sur inspection du code
-

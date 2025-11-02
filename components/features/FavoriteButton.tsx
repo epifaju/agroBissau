@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -19,6 +20,8 @@ export function FavoriteButton({
   variant = 'icon',
   onToggle,
 }: FavoriteButtonProps) {
+  const t = useTranslations('listing');
+  const tCommon = useTranslations('common');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [loading, setLoading] = useState(false);
@@ -73,7 +76,7 @@ export function FavoriteButton({
           setIsFavorite(!newState);
           onToggle?.(!newState);
           const data = await response.json();
-          alert(data.error || 'Erreur lors de l\'ajout aux favoris');
+          alert(data.error || t('favoriteError'));
           return;
         }
 
@@ -90,7 +93,7 @@ export function FavoriteButton({
           // Revert si erreur
           setIsFavorite(!newState);
           onToggle?.(!newState);
-          alert('Erreur lors de la suppression des favoris');
+          alert(t('unfavoriteError'));
           return;
         }
       }
@@ -99,7 +102,7 @@ export function FavoriteButton({
       setIsFavorite(!newState);
       onToggle?.(!newState);
       console.error('Error toggling favorite:', error);
-      alert('Une erreur est survenue');
+      alert(tCommon('error'));
     } finally {
       setLoading(false);
       setTimeout(() => setAnimating(false), 300);
@@ -126,7 +129,7 @@ export function FavoriteButton({
         className="flex items-center gap-2"
       >
         {iconContent}
-        <span>{isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}</span>
+        <span>{isFavorite ? t('unfavorite') : t('favorite')}</span>
       </Button>
     );
   }
@@ -142,7 +145,7 @@ export function FavoriteButton({
       className={`absolute top-2 right-2 p-2 bg-white/90 rounded-full shadow-md hover:bg-white transition-all z-20 ${
         !shouldShow ? 'opacity-0 pointer-events-none' : ''
       }`}
-      aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+      aria-label={isFavorite ? t('unfavorite') : t('favorite')}
       suppressHydrationWarning
     >
       {iconContent}

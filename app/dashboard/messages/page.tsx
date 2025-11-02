@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { ChatList } from '@/components/features/ChatList';
 import { ChatWindow } from '@/components/features/ChatWindow';
 import { Card } from '@/components/ui/card';
 
 export default function MessagesPage() {
+  const t = useTranslations('dashboard.messages');
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -107,13 +109,13 @@ export default function MessagesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Messages</h1>
+        <h1 className="text-3xl font-bold mb-8">{t('title')}</h1>
         <div className="grid lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
           {/* Conversations list */}
           <div className="lg:col-span-1">
             <Card className="h-full overflow-hidden">
               <div className="p-4 border-b">
-                <h2 className="font-semibold">Conversations</h2>
+                <h2 className="font-semibold">{t('conversations')}</h2>
               </div>
               <div className="overflow-y-auto h-[calc(100%-65px)] p-4">
                 <ChatList
@@ -142,9 +144,9 @@ export default function MessagesPage() {
               ) : (
                 <div className="h-full flex items-center justify-center text-gray-500">
                   <div className="text-center">
-                    <p className="text-lg mb-2">Sélectionnez une conversation</p>
+                    <p className="text-lg mb-2">{t('selectConversation')}</p>
                     <p className="text-sm">
-                      Choisissez une conversation dans la liste à gauche ou utilisez le bouton "Contacter" sur un profil pour commencer à discuter.
+                      {t('selectConversationDescription')}
                     </p>
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Flag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,20 +24,13 @@ interface ReportButtonProps {
   variant?: 'icon' | 'button';
 }
 
-const REPORT_TYPES = [
-  { value: 'SPAM', label: 'Spam' },
-  { value: 'INAPPROPRIATE', label: 'Contenu inapproprié' },
-  { value: 'FAKE', label: 'Contenu faux ou trompeur' },
-  { value: 'COPYRIGHT', label: 'Violation de droits d\'auteur' },
-  { value: 'SCAM', label: 'Arnaque' },
-  { value: 'OTHER', label: 'Autre' },
-];
-
 export function ReportButton({
   reportedUserId,
   reportedListingId,
   variant = 'icon',
 }: ReportButtonProps) {
+  const t = useTranslations('report');
+  const tCommon = useTranslations('common');
   const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -45,6 +39,15 @@ export function ReportButton({
   const [description, setDescription] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  const REPORT_TYPES = [
+    { value: 'SPAM', label: t('types.spam') },
+    { value: 'INAPPROPRIATE', label: t('types.inappropriate') },
+    { value: 'FAKE', label: t('types.fake') },
+    { value: 'COPYRIGHT', label: t('types.copyright') },
+    { value: 'SCAM', label: t('types.scam') },
+    { value: 'OTHER', label: t('types.other') },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,12 +58,12 @@ export function ReportButton({
     }
 
     if (!type) {
-      setError('Veuillez sélectionner un type de signalement');
+      setError(t('errors.selectType'));
       return;
     }
 
     if (description.length < 10) {
-      setError('La description doit contenir au moins 10 caractères');
+      setError(t('errors.minDescription'));
       return;
     }
 
@@ -83,7 +86,7 @@ export function ReportButton({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Erreur lors de la création du rapport');
+        throw new Error(data.error || t('errors.createError'));
       }
 
       setSuccess(true);
@@ -95,7 +98,7 @@ export function ReportButton({
         setDescription('');
       }, 2000);
     } catch (err: any) {
-      setError(err.message || 'Une erreur est survenue');
+      setError(err.message || tCommon('error'));
     } finally {
       setLoading(false);
     }
@@ -121,7 +124,7 @@ export function ReportButton({
   ) : (
     <>
       <Flag className="w-4 h-4 mr-2" />
-      Signaler
+      {t('button')}
     </>
   );
 
@@ -144,21 +147,21 @@ export function ReportButton({
 
       <ModalContent>
         <ModalHeader>
-          <ModalTitle>Signaler un contenu</ModalTitle>
+          <ModalTitle>{t('title')}</ModalTitle>
           <ModalDescription>
             {reportedListingId
-              ? 'Vous êtes sur le point de signaler une annonce. Veuillez nous aider à comprendre le problème.'
-              : 'Vous êtes sur le point de signaler un utilisateur. Veuillez nous aider à comprendre le problème.'}
+              ? t('descriptionListing')
+              : t('descriptionUser')}
           </ModalDescription>
         </ModalHeader>
 
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="type">Type de signalement *</Label>
+              <Label htmlFor="type">{t('typeLabel')} *</Label>
               <Select value={type} onValueChange={setType}>
                 <SelectTrigger id="type">
-                  <SelectValue placeholder="Sélectionner un type" />
+                  <SelectValue placeholder={t('typePlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {REPORT_TYPES.map((reportType) => (
@@ -172,10 +175,10 @@ export function ReportButton({
 
             {type === 'OTHER' && (
               <div className="space-y-2">
-                <Label htmlFor="reason">Raison (optionnel)</Label>
+                <Label htmlFor="reason">{t('reasonLabel')}</Label>
                 <Textarea
                   id="reason"
-                  placeholder="Décrivez brièvement la raison..."
+                  placeholder={t('reasonPlaceholder')}
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   rows={2}
@@ -184,10 +187,10 @@ export function ReportButton({
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description *</Label>
+              <Label htmlFor="description">{t('descriptionLabel')} *</Label>
               <Textarea
                 id="description"
-                placeholder="Décrivez en détail le problème... (minimum 10 caractères)"
+                placeholder={t('descriptionPlaceholder')}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
@@ -195,7 +198,7 @@ export function ReportButton({
                 minLength={10}
               />
               <p className="text-xs text-gray-500">
-                {description.length}/10 caractères minimum
+                {description.length}/{t('minChars')}
               </p>
             </div>
 
@@ -207,7 +210,7 @@ export function ReportButton({
 
             {success && (
               <div className="rounded-md bg-green-50 p-3 text-sm text-green-800">
-                Rapport créé avec succès. Nous examinerons votre signalement sous peu.
+                {t('success')}
               </div>
             )}
           </div>
@@ -219,10 +222,10 @@ export function ReportButton({
               onClick={() => handleOpenChange(false)}
               disabled={loading}
             >
-              Annuler
+              {tCommon('cancel')}
             </Button>
             <Button type="submit" disabled={loading || !type || description.length < 10}>
-              {loading ? 'Envoi...' : 'Envoyer le rapport'}
+              {loading ? t('sending') : t('submit')}
             </Button>
           </ModalFooter>
         </form>

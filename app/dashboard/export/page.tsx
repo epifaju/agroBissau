@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +11,8 @@ import { Download, FileSpreadsheet, MessageSquare, TrendingUp, Package, ArrowLef
 import Link from 'next/link';
 
 export default function ExportPage() {
+  const t = useTranslations('dashboard.export');
+  const tCommon = useTranslations('common');
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [exporting, setExporting] = useState<string | null>(null);
@@ -17,7 +20,7 @@ export default function ExportPage() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div>Chargement...</div>
+        <div>{tCommon('loading')}</div>
       </div>
     );
   }
@@ -39,7 +42,7 @@ export default function ExportPage() {
       
       if (!response.ok) {
         const error = await response.json();
-        alert(error.error || 'Erreur lors de l\'export');
+        alert(error.error || t('error'));
         return;
       }
 
@@ -68,7 +71,7 @@ export default function ExportPage() {
       window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error('Error exporting:', error);
-      alert('Erreur lors de l\'export');
+      alert(t('error'));
     } finally {
       setExporting(null);
     }
@@ -82,14 +85,14 @@ export default function ExportPage() {
         <Link href="/dashboard">
           <Button variant="ghost" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour au dashboard
+            {t('backToDashboard')}
           </Button>
         </Link>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">Export de données</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-gray-600 mt-2">
-            Téléchargez vos données au format CSV ou JSON pour une analyse externe
+            {t('description')}
           </p>
         </div>
 
@@ -99,12 +102,12 @@ export default function ExportPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Package className="w-5 h-5 text-green-600" />
-                Export des annonces
+                {t('listings')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-gray-600">
-                Exportez toutes vos annonces avec leurs statistiques (vues, contacts, etc.)
+                {t('listingsDescription')}
               </p>
               <Button
                 onClick={() => handleExport('listings', 'csv')}
@@ -112,11 +115,11 @@ export default function ExportPage() {
                 className="w-full"
               >
                 {exporting === 'listings' ? (
-                  <>Téléchargement...</>
+                  <>{t('downloading')}</>
                 ) : (
                   <>
                     <Download className="w-4 h-4 mr-2" />
-                    Exporter en CSV
+                    {t('exportCSV')}
                   </>
                 )}
               </Button>
@@ -128,12 +131,12 @@ export default function ExportPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-blue-600" />
-                Export des messages
+                {t('messages')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-gray-600">
-                Exportez toutes vos conversations et messages au format CSV ou JSON
+                {t('messagesDescription')}
               </p>
               <div className="flex gap-2">
                 <Button
@@ -175,12 +178,12 @@ export default function ExportPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-purple-600" />
-                Export des analytics
+                {t('analytics')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-gray-600">
-                Exportez vos statistiques d'analytics avec les performances par annonce
+                {t('analyticsDescription')}
               </p>
               <Button
                 onClick={() => handleExport('analytics', 'csv')}
@@ -188,11 +191,11 @@ export default function ExportPage() {
                 className="w-full"
               >
                 {exporting === 'analytics' ? (
-                  <>Téléchargement...</>
+                  <>{t('downloading')}</>
                 ) : (
                   <>
                     <Download className="w-4 h-4 mr-2" />
-                    Exporter en CSV
+                    {t('exportCSV')}
                   </>
                 )}
               </Button>
@@ -202,20 +205,20 @@ export default function ExportPage() {
 
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>À propos de l'export</CardTitle>
+            <CardTitle>{t('about')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-gray-600">
             <p>
-              • Les fichiers CSV peuvent être ouverts dans Excel, Google Sheets ou tout tableur
+              • {t('info1')}
             </p>
             <p>
-              • Le format JSON est recommandé pour les messages afin de préserver la structure des conversations
+              • {t('info2')}
             </p>
             <p>
-              • Les données sont exportées au moment du téléchargement
+              • {t('info3')}
             </p>
             <p>
-              • Les fichiers contiennent toutes vos données jusqu'à la date d'export
+              • {t('info4')}
             </p>
           </CardContent>
         </Card>

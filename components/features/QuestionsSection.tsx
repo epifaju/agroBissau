@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { MessageSquare, Send, Clock, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,9 @@ export function QuestionsSection({
   listingOwnerId,
   listingTitle,
 }: QuestionsSectionProps) {
+  const t = useTranslations('questions');
+  const tCommon = useTranslations('common');
+  const tNav = useTranslations('nav');
   const { user, isAuthenticated } = useAuth();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,12 +89,12 @@ export function QuestionsSection({
     }
 
     if (newQuestion.trim().length < 5) {
-      setError('La question doit contenir au moins 5 caractères');
+      setError(t('errors.minLength'));
       return;
     }
 
     if (newQuestion.trim().length > 500) {
-      setError('La question ne peut pas dépasser 500 caractères');
+      setError(t('errors.maxLength'));
       return;
     }
 
@@ -111,11 +115,11 @@ export function QuestionsSection({
         // Recharger les questions
         await fetchQuestions();
       } else {
-        setError(data.error || 'Erreur lors de la création de la question');
+        setError(data.error || t('errors.createError'));
       }
     } catch (error) {
       console.error('Error submitting question:', error);
-      setError('Une erreur est survenue');
+      setError(tCommon('error'));
     } finally {
       setSubmitting(false);
     }
@@ -123,12 +127,12 @@ export function QuestionsSection({
 
   const handleSubmitAnswer = async (questionId: string, answerContent: string) => {
     if (answerContent.trim().length < 5) {
-      alert('La réponse doit contenir au moins 5 caractères');
+      alert(t('errors.answerMinLength'));
       return;
     }
 
     if (answerContent.trim().length > 1000) {
-      alert('La réponse ne peut pas dépasser 1000 caractères');
+      alert(t('errors.answerMaxLength'));
       return;
     }
 
@@ -145,11 +149,11 @@ export function QuestionsSection({
         // Recharger les questions
         await fetchQuestions();
       } else {
-        alert(data.error || 'Erreur lors de la création de la réponse');
+        alert(data.error || t('errors.answerCreateError'));
       }
     } catch (error) {
       console.error('Error submitting answer:', error);
-      alert('Une erreur est survenue');
+      alert(tCommon('error'));
     }
   };
 
@@ -161,7 +165,7 @@ export function QuestionsSection({
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center py-8">Chargement des questions...</div>
+          <div className="text-center py-8">{t('loading')}</div>
         </CardContent>
       </Card>
     );
@@ -172,7 +176,7 @@ export function QuestionsSection({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MessageSquare className="w-5 h-5" />
-          Questions et Réponses
+          {t('title')}
           {questions.length > 0 && (
             <Badge variant="secondary" className="ml-2">
               {questions.length}
@@ -186,7 +190,7 @@ export function QuestionsSection({
           <form onSubmit={handleSubmitQuestion} className="mb-6">
             <div className="space-y-2">
               <Textarea
-                placeholder="Posez une question au vendeur..."
+                placeholder={t('askPlaceholder')}
                 value={newQuestion}
                 onChange={(e) => {
                   setNewQuestion(e.target.value);
@@ -198,7 +202,7 @@ export function QuestionsSection({
               />
               <div className="flex items-center justify-between">
                 <p className="text-xs text-gray-500">
-                  {newQuestion.length}/500 caractères
+                  {newQuestion.length}/500 {t('charCount')}
                 </p>
                 {error && (
                   <p className="text-xs text-red-600">{error}</p>
@@ -206,7 +210,7 @@ export function QuestionsSection({
               </div>
               <Button type="submit" disabled={submitting || newQuestion.trim().length < 5}>
                 <Send className="w-4 h-4 mr-2" />
-                {submitting ? 'Envoi...' : 'Poser la question'}
+                {submitting ? t('sending') : t('submit')}
               </Button>
             </div>
           </form>
@@ -215,7 +219,7 @@ export function QuestionsSection({
         {!isAuthenticated && (
           <div className="mb-6 p-4 bg-gray-50 rounded-lg text-center">
             <p className="text-sm text-gray-600 mb-2">
-              Connectez-vous pour poser une question au vendeur
+              {t('loginPrompt')}
             </p>
             <Button
               variant="outline"
@@ -224,21 +228,21 @@ export function QuestionsSection({
                 window.location.href = `/login?redirect=/listings/${listingId}`;
               }}
             >
-              Se connecter
+              {tNav('login')}
             </Button>
           </div>
         )}
 
         {isListingOwner && questions.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            Aucune question pour le moment
+            {t('empty')}
           </div>
         )}
 
         {/* Liste des questions */}
         {questions.length === 0 && !isListingOwner && !isAuthenticated && (
           <div className="text-center py-8 text-gray-500">
-            Aucune question pour le moment. Soyez le premier à poser une question !
+            {t('emptyPublic')}
           </div>
         )}
 
@@ -269,13 +273,13 @@ export function QuestionsSection({
                     {!question.answer && (
                       <Badge variant="outline" className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        En attente
+                        {t('pending')}
                       </Badge>
                     )}
                     {question.answer && (
                       <Badge variant="default" className="bg-green-100 text-green-800 flex items-center gap-1">
                         <CheckCircle className="w-3 h-3" />
-                        Répondu
+                        {t('answered')}
                       </Badge>
                     )}
                   </div>
@@ -299,7 +303,7 @@ export function QuestionsSection({
                           <p className="font-semibold text-sm text-green-700">
                             {question.answer.answerer.firstName} {question.answer.answerer.lastName}
                           </p>
-                          <span className="text-xs text-gray-500">Vendeur</span>
+                          <span className="text-xs text-gray-500">{t('seller')}</span>
                           <span className="text-xs text-gray-500">
                             {formatRelativeTime(question.answer.createdAt)}
                           </span>
@@ -330,6 +334,7 @@ interface AnswerFormProps {
 }
 
 function AnswerForm({ questionId, onSubmit }: AnswerFormProps) {
+  const t = useTranslations('questions');
   const [answer, setAnswer] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -337,12 +342,12 @@ function AnswerForm({ questionId, onSubmit }: AnswerFormProps) {
     e.preventDefault();
 
     if (answer.trim().length < 5) {
-      alert('La réponse doit contenir au moins 5 caractères');
+      alert(t('errors.answerMinLength'));
       return;
     }
 
     if (answer.trim().length > 1000) {
-      alert('La réponse ne peut pas dépasser 1000 caractères');
+      alert(t('errors.answerMaxLength'));
       return;
     }
 
@@ -361,7 +366,7 @@ function AnswerForm({ questionId, onSubmit }: AnswerFormProps) {
     <form onSubmit={handleSubmit} className="ml-11">
       <div className="bg-gray-50 rounded-lg p-4 space-y-2">
         <Textarea
-          placeholder="Répondez à cette question..."
+          placeholder={t('answerPlaceholder')}
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
           rows={3}
@@ -369,10 +374,10 @@ function AnswerForm({ questionId, onSubmit }: AnswerFormProps) {
           required
         />
         <div className="flex items-center justify-between">
-          <p className="text-xs text-gray-500">{answer.length}/1000 caractères</p>
+          <p className="text-xs text-gray-500">{answer.length}/1000 {t('charCount')}</p>
           <Button type="submit" size="sm" disabled={submitting || answer.trim().length < 5}>
             <Send className="w-3 h-3 mr-2" />
-            {submitting ? 'Envoi...' : 'Répondre'}
+            {submitting ? t('sending') : t('answer')}
           </Button>
         </div>
       </div>

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { registerSchema } from '@/lib/validations';
+import { Mail, CheckCircle } from 'lucide-react';
 
 export default function RegisterPage() {
   const t = useTranslations('auth.register');
@@ -21,11 +22,13 @@ export default function RegisterPage() {
     phone: '',
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess(false);
     setLoading(true);
 
     try {
@@ -42,7 +45,11 @@ export default function RegisterPage() {
       if (!response.ok) {
         setError(data.error || t('error.generic'));
       } else {
-        router.push('/login?registered=true');
+        setSuccess(true);
+        // Redirect to login after showing success message
+        setTimeout(() => {
+          router.push('/login?registered=true');
+        }, 3000);
       }
     } catch (err: any) {
       setError(err.errors?.[0]?.message || t('error.generic'));
@@ -65,6 +72,23 @@ export default function RegisterPage() {
             {error && (
               <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
                 {error}
+              </div>
+            )}
+            {success && (
+              <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-md">
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="font-semibold mb-1">Compte créé avec succès !</p>
+                    <p className="text-sm">
+                      Un email de vérification a été envoyé à <strong>{formData.email}</strong>. 
+                      Veuillez cliquer sur le lien dans l'email pour activer votre compte.
+                    </p>
+                    <p className="text-xs mt-2 text-green-700">
+                      Redirection vers la page de connexion...
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
             <div className="grid grid-cols-2 gap-4">

@@ -35,6 +35,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Compte désactivé');
         }
 
+        if (!user.isEmailVerified) {
+          throw new Error('EMAIL_NOT_VERIFIED');
+        }
+
         return {
           id: user.id,
           email: user.email,
@@ -58,7 +62,7 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!existingUser) {
-          // Create new user from Google
+          // Create new user from Google (auto-verified)
           await prisma.user.create({
             data: {
               email: user.email!,
@@ -66,6 +70,7 @@ export const authOptions: NextAuthOptions = {
               lastName: user.name?.split(' ').slice(1).join(' ') || '',
               avatar: user.image,
               verificationLevel: 1,
+              isEmailVerified: true, // Google emails are pre-verified
             },
           });
         }

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { registerSchema } from '@/lib/validations';
 import * as bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import { sendEmailVerificationEmail } from '@/lib/notifications/email';
 
 export async function POST(req: Request) {
   try {
@@ -31,11 +33,38 @@ export async function POST(req: Request) {
         firstName: validated.firstName,
         lastName: validated.lastName,
         phone: validated.phone || null,
+        isEmailVerified: false,
       },
     });
 
+    // Generate verification token
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Create verification record
+    await prisma.emailVerification.create({
+      data: {
+        userId: user.id,
+        token,
+        expiresAt,
+      },
+    });
+
+    // Send verification email (don't await to avoid blocking)
+    sendEmailVerificationEmail(
+      validated.email,
+      `${validated.firstName} ${validated.lastName}`,
+      token
+    ).catch((error) => {
+      console.error('Error sending verification email:', error);
+    });
+
     return NextResponse.json(
-      { message: 'Compte créé avec succès', userId: user.id },
+      { 
+        message: 'Compte créé avec succès. Veuillez vérifier votre email.', 
+        userId: user.id,
+        requiresVerification: true
+      },
       { status: 201 }
     );
   } catch (error: any) {

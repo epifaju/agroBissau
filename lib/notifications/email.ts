@@ -346,3 +346,117 @@ export async function sendSearchAlertEmail(
   });
 }
 
+export async function sendEmailVerificationEmail(
+  userEmail: string,
+  userName: string,
+  verificationToken: string
+) {
+  const verificationUrl = `${process.env.NEXTAUTH_URL}/auth/verify-email?token=${verificationToken}`;
+
+  return sendEmail({
+    to: userEmail,
+    subject: 'Vérifiez votre adresse email - AgroBissau',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #2563eb; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background: #f9fafb; }
+          .verification-box { background: white; padding: 20px; border: 2px solid #2563eb; border-radius: 5px; margin: 20px 0; text-align: center; }
+          .button { display: inline-block; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+          .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; }
+          .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>✉️ Vérifiez votre email</h1>
+          </div>
+          <div class="content">
+            <p>Bonjour ${userName},</p>
+            <p>Merci de vous être inscrit sur AgroBissau ! Pour activer votre compte, veuillez vérifier votre adresse email en cliquant sur le bouton ci-dessous :</p>
+            
+            <div class="verification-box">
+              <a href="${verificationUrl}" class="button">
+                Vérifier mon email
+              </a>
+            </div>
+
+            <div class="warning">
+              <strong>⚠️ Important :</strong> Ce lien est valable pendant 24 heures. Si vous n'avez pas créé de compte, ignorez cet email.
+            </div>
+
+            <p>Si le bouton ne fonctionne pas, copiez et collez le lien suivant dans votre navigateur :</p>
+            <p style="word-break: break-all; color: #2563eb; font-size: 12px;">${verificationUrl}</p>
+          </div>
+          <div class="footer">
+            <p>À bientôt sur AgroBissau !</p>
+            <p style="margin-top: 15px;">
+              Si vous avez des questions, <a href="${process.env.NEXTAUTH_URL}/contact" style="color: #2563eb;">contactez-nous</a>
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}
+
+export async function sendEmailVerifiedEmail(userEmail: string, userName: string) {
+  return sendEmail({
+    to: userEmail,
+    subject: 'Email vérifié avec succès - AgroBissau',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #22c55e; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background: #f9fafb; }
+          .success-box { background: white; padding: 20px; border: 2px solid #22c55e; border-radius: 5px; margin: 20px 0; text-align: center; }
+          .button { display: inline-block; padding: 12px 24px; background: #22c55e; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>✅ Email vérifié !</h1>
+          </div>
+          <div class="content">
+            <p>Bonjour ${userName},</p>
+            <p>Félicitations ! Votre adresse email a été vérifiée avec succès.</p>
+            
+            <div class="success-box">
+              <p style="font-size: 48px; margin: 0;">✓</p>
+              <p>Votre compte est maintenant actif !</p>
+            </div>
+
+            <p>Vous pouvez maintenant profiter de toutes les fonctionnalités d'AgroBissau :</p>
+            <ul>
+              <li>Publier vos annonces de produits agricoles</li>
+              <li>Rechercher et contacter des producteurs</li>
+              <li>Échanger en temps réel</li>
+              <li>Bénéficier de notre système de notation</li>
+            </ul>
+
+            <div style="text-align: center; margin-top: 30px;">
+              <a href="${process.env.NEXTAUTH_URL}" class="button">
+                Accéder à mon compte
+              </a>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}
+

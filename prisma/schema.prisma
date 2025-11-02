@@ -8,38 +8,39 @@ datasource db {
 }
 
 model User {
-  id                String   @id @default(cuid())
-  email             String   @unique
-  password          String? // Nullable for OAuth users
-  phone             String?  @unique
-  firstName         String
-  lastName          String
-  avatar            String?
-  role              UserRole @default(MEMBER)
-  subscriptionTier  SubTier  @default(FREE)
-  verificationLevel Int      @default(0)
-  isActive          Boolean  @default(true)
-  location          Json?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  listings                Listing[]
-  messages                Message[]                @relation("SentMessages")
-  receivedMessages        Message[]                @relation("ReceivedMessages")
-  reviews                 Review[]                 @relation("ReviewsGiven")
-  reviewsReceived         Review[]                 @relation("ReviewsReceived")
-  transactions            Transaction[]
-  subscription            Subscription?
-  pushSubscriptions       PushSubscription[]
-  notifications           Notification[]
-  notificationPreferences NotificationPreferences?
-  searchAlerts            SearchAlert[]
-  favorites               Favorite[]
-  badges                  UserBadge[]
-  reportsMade             Report[]                 @relation("ReportsMade")
-  reportsReceived         Report[]                 @relation("ReportsReceived")
-  questionsAsked          Question[]               @relation("QuestionsAsked")
+  id                      String                   @id @default(cuid())
+  email                   String                   @unique
+  password                String?
+  phone                   String?                  @unique
+  firstName               String
+  lastName                String
+  avatar                  String?
+  role                    UserRole                 @default(MEMBER)
+  subscriptionTier        SubTier                  @default(FREE)
+  verificationLevel       Int                      @default(0)
+  isActive                Boolean                  @default(true)
+  isEmailVerified         Boolean                  @default(false)
+  location                Json?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
   answersGiven            Answer[]                 @relation("AnswersGiven")
+  emailVerifications      EmailVerification[]
+  favorites               Favorite[]
+  listings                Listing[]
+  receivedMessages        Message[]                @relation("ReceivedMessages")
+  messages                Message[]                @relation("SentMessages")
+  notificationPreferences NotificationPreferences?
+  notifications           Notification[]
+  pushSubscriptions       PushSubscription[]
+  questionsAsked          Question[]               @relation("QuestionsAsked")
+  reportsReceived         Report[]                 @relation("ReportsReceived")
+  reportsMade             Report[]                 @relation("ReportsMade")
+  reviewsReceived         Review[]                 @relation("ReviewsReceived")
+  reviews                 Review[]                 @relation("ReviewsGiven")
+  searchAlerts            SearchAlert[]
+  subscription            Subscription?
+  transactions            Transaction[]
+  badges                  UserBadge[]
 
   @@map("users")
 }
@@ -53,7 +54,6 @@ model Listing {
   quantity        Int
   availableFrom   DateTime?
   expiresAt       DateTime?
-  category        Category      @relation(fields: [categoryId], references: [id])
   categoryId      String
   subcategory     String?
   type            ListingType
@@ -64,35 +64,32 @@ model Listing {
   featuredUntil   DateTime?
   viewCount       Int           @default(0)
   contactCount    Int           @default(0)
-  originalPrice   Decimal? // Prix original si en promotion
-  discountPercent Int? // Pourcentage de réduction (0-100)
-  promotionUntil  DateTime? // Date de fin de promotion
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  transactions Transaction[]
-  reviews      Review[]
-  favoritedBy  Favorite[]
-  reports      Report[]
-  questions    Question[]
+  originalPrice   Decimal?
+  discountPercent Int?
+  promotionUntil  DateTime?
+  userId          String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  favoritedBy     Favorite[]
+  category        Category      @relation(fields: [categoryId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
+  questions       Question[]
+  reports         Report[]
+  reviews         Review[]
+  transactions    Transaction[]
 
   @@map("listings")
 }
 
 model Category {
-  id             String  @id @default(cuid())
-  name           String  @unique
+  id             String    @id @default(cuid())
+  name           String    @unique
   namePortuguese String?
   icon           String?
   description    String?
-  isActive       Boolean @default(true)
-  order          Int     @default(0)
-
-  listings Listing[]
+  isActive       Boolean   @default(true)
+  order          Int       @default(0)
+  listings       Listing[]
 
   @@map("categories")
 }
@@ -101,12 +98,12 @@ model Message {
   id         String   @id @default(cuid())
   content    String
   isRead     Boolean  @default(false)
-  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
   senderId   String
-  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
   receiverId String
   listingId  String?
   createdAt  DateTime @default(now())
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
 
   @@map("messages")
 }
@@ -116,31 +113,29 @@ model Transaction {
   amount           Decimal
   paymentMethod    PaymentMethod
   status           TransactionStatus @default(PENDING)
-  buyer            User              @relation(fields: [buyerId], references: [id])
   buyerId          String
-  listing          Listing           @relation(fields: [listingId], references: [id])
   listingId        String
   paymentReference String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  buyer            User              @relation(fields: [buyerId], references: [id])
+  listing          Listing           @relation(fields: [listingId], references: [id])
 
   @@map("transactions")
 }
 
 model Review {
-  id         String  @id @default(cuid())
+  id         String   @id @default(cuid())
   rating     Int
   comment    String?
   response   String?
-  reviewer   User    @relation("ReviewsGiven", fields: [reviewerId], references: [id])
   reviewerId String
-  reviewed   User    @relation("ReviewsReceived", fields: [reviewedId], references: [id])
   reviewedId String
-  listing    Listing @relation(fields: [listingId], references: [id])
   listingId  String
-
-  createdAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  listing    Listing  @relation(fields: [listingId], references: [id])
+  reviewed   User     @relation("ReviewsReceived", fields: [reviewedId], references: [id])
+  reviewer   User     @relation("ReviewsGiven", fields: [reviewerId], references: [id])
 
   @@unique([reviewerId, listingId])
   @@map("reviews")
@@ -153,14 +148,201 @@ model Subscription {
   endDate          DateTime
   isActive         Boolean  @default(true)
   paymentReference String?
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId           String   @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id])
 
   @@map("subscriptions")
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userId    String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("push_subscriptions")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  title       String
+  message     String
+  type        NotificationType
+  isRead      Boolean          @default(false)
+  userId      String
+  relatedId   String?
+  relatedType String?
+  createdAt   DateTime         @default(now())
+  user        User             @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model NotificationPreferences {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  emailEnabled        Boolean  @default(true)
+  pushEnabled         Boolean  @default(true)
+  emailNewMessages    Boolean  @default(true)
+  emailNewListings    Boolean  @default(false)
+  emailNewReviews     Boolean  @default(true)
+  emailPaymentUpdates Boolean  @default(true)
+  pushNewMessages     Boolean  @default(true)
+  pushNewListings     Boolean  @default(false)
+  pushNewReviews      Boolean  @default(true)
+  pushPaymentUpdates  Boolean  @default(true)
+  updatedAt           DateTime @updatedAt
+  user                User     @relation(fields: [userId], references: [id])
+
+  @@map("notification_preferences")
+}
+
+model SearchAlert {
+  id             String    @id @default(cuid())
+  title          String
+  criteria       Json
+  isActive       Boolean   @default(true)
+  frequency      String    @default("daily")
+  lastNotifiedAt DateTime?
+  userId         String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([isActive])
+  @@map("search_alerts")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@index([userId])
+  @@index([listingId])
+  @@map("favorites")
+}
+
+model Badge {
+  id          String      @id @default(cuid())
+  name        String
+  nameKey     String      @unique
+  description String
+  icon        String
+  category    String
+  criteria    Json
+  createdAt   DateTime    @default(now())
+  userBadges  UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+  badge    Badge    @relation(fields: [badgeId], references: [id])
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@map("user_badges")
+}
+
+model Report {
+  id                String       @id @default(cuid())
+  type              ReportType
+  reason            String?
+  description       String
+  status            ReportStatus @default(PENDING)
+  reporterId        String
+  reportedUserId    String?
+  reportedListingId String?
+  adminNote         String?
+  resolvedBy        String?
+  resolvedAt        DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  reportedListing   Listing?     @relation(fields: [reportedListingId], references: [id], onDelete: Cascade)
+  reportedUser      User?        @relation("ReportsReceived", fields: [reportedUserId], references: [id], onDelete: Cascade)
+  reporter          User         @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([reporterId])
+  @@index([reportedUserId])
+  @@index([reportedListingId])
+  @@index([createdAt])
+  @@map("reports")
+}
+
+model Question {
+  id        String   @id @default(cuid())
+  content   String
+  listingId String
+  askerId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  answer    Answer?
+  asker     User     @relation("QuestionsAsked", fields: [askerId], references: [id], onDelete: Cascade)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@index([askerId])
+  @@map("questions")
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  content    String
+  questionId String   @unique
+  answererId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  answerer   User     @relation("AnswersGiven", fields: [answererId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("answers")
+}
+
+model ShortUrl {
+  id          String    @id @default(cuid())
+  shortCode   String    @unique
+  originalUrl String
+  clickCount  Int       @default(0)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([shortCode])
+  @@index([createdAt])
+  @@map("short_urls")
+}
+
+model EmailVerification {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("email_verifications")
 }
 
 enum UserRole {
@@ -214,139 +396,6 @@ enum NotificationType {
   ANSWER_RECEIVED
 }
 
-model PushSubscription {
-  id        String   @id @default(cuid())
-  endpoint  String   @unique
-  p256dh    String
-  auth      String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("push_subscriptions")
-}
-
-model Notification {
-  id          String           @id @default(cuid())
-  title       String
-  message     String
-  type        NotificationType
-  isRead      Boolean          @default(false)
-  userId      String
-  user        User             @relation(fields: [userId], references: [id])
-  relatedId   String?
-  relatedType String?
-  createdAt   DateTime         @default(now())
-
-  @@map("notifications")
-}
-
-model NotificationPreferences {
-  id                  String   @id @default(cuid())
-  userId              String   @unique
-  user                User     @relation(fields: [userId], references: [id])
-  emailEnabled        Boolean  @default(true)
-  pushEnabled         Boolean  @default(true)
-  emailNewMessages    Boolean  @default(true)
-  emailNewListings    Boolean  @default(false)
-  emailNewReviews     Boolean  @default(true)
-  emailPaymentUpdates Boolean  @default(true)
-  pushNewMessages     Boolean  @default(true)
-  pushNewListings     Boolean  @default(false)
-  pushNewReviews      Boolean  @default(true)
-  pushPaymentUpdates  Boolean  @default(true)
-  updatedAt           DateTime @updatedAt
-
-  @@map("notification_preferences")
-}
-
-model SearchAlert {
-  id             String    @id @default(cuid())
-  title          String
-  criteria       Json // { categoryId, minPrice, maxPrice, location, keywords, type }
-  isActive       Boolean   @default(true)
-  frequency      String    @default("daily") // daily, weekly, instant
-  lastNotifiedAt DateTime?
-  user           User      @relation(fields: [userId], references: [id])
-  userId         String
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  @@index([userId])
-  @@index([isActive])
-  @@map("search_alerts")
-}
-
-model Favorite {
-  id        String   @id @default(cuid())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  listingId String
-  createdAt DateTime @default(now())
-
-  @@unique([userId, listingId])
-  @@index([userId])
-  @@index([listingId])
-  @@map("favorites")
-}
-
-model Badge {
-  id          String   @id @default(cuid())
-  name        String
-  nameKey     String   @unique // Pour référence (ex: "first_listing")
-  description String
-  icon        String // Emoji ou URL icône
-  category    String // "achievement", "milestone", etc.
-  criteria    Json // { type: "listing_count", value: 10 }
-  createdAt   DateTime @default(now())
-
-  userBadges UserBadge[]
-
-  @@map("badges")
-}
-
-model UserBadge {
-  id       String   @id @default(cuid())
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId   String
-  badge    Badge    @relation(fields: [badgeId], references: [id])
-  badgeId  String
-  earnedAt DateTime @default(now())
-
-  @@unique([userId, badgeId])
-  @@index([userId])
-  @@map("user_badges")
-}
-
-model Report {
-  id                String       @id @default(cuid())
-  type              ReportType
-  reason            String?
-  description       String
-  status            ReportStatus @default(PENDING)
-  reporter          User         @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
-  reporterId        String
-  reportedUser      User?        @relation("ReportsReceived", fields: [reportedUserId], references: [id], onDelete: Cascade)
-  reportedUserId    String?
-  reportedListing   Listing?     @relation(fields: [reportedListingId], references: [id], onDelete: Cascade)
-  reportedListingId String?
-  adminNote         String?
-  resolvedBy        String?
-  resolvedAt        DateTime?
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-
-  @@index([status])
-  @@index([reporterId])
-  @@index([reportedUserId])
-  @@index([reportedListingId])
-  @@index([createdAt])
-  @@map("reports")
-}
-
 enum ReportType {
   SPAM
   INAPPROPRIATE
@@ -361,47 +410,4 @@ enum ReportStatus {
   REVIEWING
   RESOLVED
   DISMISSED
-}
-
-model Question {
-  id        String   @id @default(cuid())
-  content   String
-  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  listingId String
-  asker     User     @relation("QuestionsAsked", fields: [askerId], references: [id], onDelete: Cascade)
-  askerId   String
-  answer    Answer?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([listingId])
-  @@index([askerId])
-  @@map("questions")
-}
-
-model Answer {
-  id         String   @id @default(cuid())
-  content    String
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionId String   @unique
-  answerer   User     @relation("AnswersGiven", fields: [answererId], references: [id], onDelete: Cascade)
-  answererId String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@map("answers")
-}
-
-model ShortUrl {
-  id        String   @id @default(cuid())
-  shortCode String   @unique
-  originalUrl String @db.Text
-  clickCount Int      @default(0)
-  expiresAt  DateTime?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([shortCode])
-  @@index([createdAt])
-  @@map("short_urls")
 }

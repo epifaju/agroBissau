@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { MapPin } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 
 // Fix Leaflet default icon issue
 if (typeof window !== 'undefined') {
@@ -76,65 +75,57 @@ export function ListingMap({
 
   if (!position) {
     return (
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 text-gray-600">
-            <MapPin className="w-5 h-5" />
-            <div>
-              <p className="font-semibold">{location.city || 'Localisation non spécifiée'}</p>
-              {location.address && <p className="text-sm">{location.address}</p>}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex items-center gap-2 text-gray-600">
+        <MapPin className="w-5 h-5" />
+        <div>
+          <p className="font-semibold">{location.city || 'Localisation non spécifiée'}</p>
+          {location.address && <p className="text-sm">{location.address}</p>}
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardContent className="p-0">
-        <div className="relative" style={{ height }}>
-          {typeof window !== 'undefined' && (
-            <MapContainer
-              center={mapCenter}
-              zoom={13}
-              style={{ height: '100%', width: '100%', zIndex: 0 }}
-              scrollWheelZoom={false}
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <Marker position={position}>
-                <Popup>
-                  <div>
-                    {title && <p className="font-semibold mb-1">{title}</p>}
-                    <p className="text-sm">{location.city || 'Localisation'}</p>
-                    {location.address && (
-                      <p className="text-xs text-gray-600">{location.address}</p>
-                    )}
-                  </div>
-                </Popup>
-              </Marker>
-            </MapContainer>
-          )}
-          {typeof window === 'undefined' && (
-            <div className="h-full w-full flex items-center justify-center bg-gray-100">
-              <p className="text-gray-500">Chargement de la carte...</p>
-            </div>
-          )}
-        </div>
-        <div className="p-4 border-t">
-          <div className="flex items-center gap-2 text-gray-600">
-            <MapPin className="w-5 h-5" />
-            <div>
-              <p className="font-semibold">{location.city || 'Localisation'}</p>
-              {location.address && <p className="text-sm">{location.address}</p>}
-            </div>
+    <>
+      <div className="relative" style={{ height }}>
+        {typeof window !== 'undefined' && (
+          <MapContainer
+            center={mapCenter}
+            zoom={13}
+            style={{ height: '100%', width: '100%', zIndex: 0 }}
+            scrollWheelZoom={false}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker position={position}>
+              <Popup>
+                <div>
+                  {title && <p className="font-semibold mb-1">{title}</p>}
+                  <p className="text-sm">{location.city || 'Localisation'}</p>
+                  {location.address && (
+                    <p className="text-xs text-gray-600">{location.address}</p>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          </MapContainer>
+        )}
+        {typeof window === 'undefined' && (
+          <div className="h-full w-full flex items-center justify-center bg-gray-100">
+            <p className="text-gray-500">Chargement de la carte...</p>
           </div>
+        )}
+      </div>
+      <div className="flex items-center gap-2 text-gray-600 mt-3">
+        <MapPin className="w-5 h-5" />
+        <div>
+          <p className="font-semibold">{location.city || 'Localisation'}</p>
+          {location.address && <p className="text-sm">{location.address}</p>}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </>
   );
 }
 

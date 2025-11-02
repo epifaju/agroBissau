@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { loginSchema } from '@/lib/validations';
+import { Mail, CheckCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const t = useTranslations('auth.login');
@@ -18,6 +19,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +37,12 @@ export default function LoginPage() {
       });
 
       if (response?.error) {
-        setError(t('error.invalid'));
+        if (response.error === 'EMAIL_NOT_VERIFIED') {
+          setRegisteredEmail(email);
+          setError('Veuillez vérifier votre email avant de vous connecter. Un email de vérification vous a été envoyé.');
+        } else {
+          setError(t('error.invalid'));
+        }
       } else {
         router.push('/dashboard');
         router.refresh();
@@ -43,6 +51,29 @@ export default function LoginPage() {
       setError(err.errors?.[0]?.message || t('error.generic'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setResending(true);
+    try {
+      const response = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: registeredEmail }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setError('Un nouveau lien de vérification a été envoyé à votre email.');
+        setTimeout(() => setError(''), 5000);
+      } else {
+        setError(data.error || 'Erreur lors de l\'envoi du lien');
+      }
+    } catch (error) {
+      setError('Erreur lors de l\'envoi du lien');
+    } finally {
+      setResending(false);
     }
   };
 
@@ -60,6 +91,19 @@ export default function LoginPage() {
             {error && (
               <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
                 {error}
+                {registeredEmail && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 w-full"
+                    onClick={handleResendVerification}
+                    disabled={resending}
+                  >
+                    <Mail className="w-4 h-4 mr-2" />
+                    {resending ? 'Envoi en cours...' : 'Renvoyer le lien'}
+                  </Button>
+                )}
               </div>
             )}
             <div className="space-y-2">

@@ -83,6 +83,42 @@ if (process.env.NODE_ENV === 'production' || process.env.ENABLE_PWA === 'true') 
         },
       },
       {
+        urlPattern: /^\//i,
+        handler: 'NetworkFirst',
+        options: {
+          cacheName: 'pages',
+          expiration: {
+            maxEntries: 50,
+            maxAgeSeconds: 24 * 60 * 60, // 24 hours
+          },
+          networkTimeoutSeconds: 10,
+        },
+      },
+      {
+        urlPattern: /^\/dashboard\/.*$/i,
+        handler: 'NetworkFirst',
+        options: {
+          cacheName: 'dashboard-pages',
+          expiration: {
+            maxEntries: 20,
+            maxAgeSeconds: 60 * 60, // 1 hour
+          },
+          networkTimeoutSeconds: 10,
+        },
+      },
+      {
+        urlPattern: /^\/api\/users\/me\/.*$/i,
+        handler: 'NetworkFirst',
+        options: {
+          cacheName: 'user-api',
+          expiration: {
+            maxEntries: 20,
+            maxAgeSeconds: 5 * 60, // 5 minutes
+          },
+          networkTimeoutSeconds: 10,
+        },
+      },
+      {
         urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
         handler: 'CacheFirst',
         options: {

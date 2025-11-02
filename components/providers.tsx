@@ -5,7 +5,9 @@ import { NextIntlClientProvider } from 'next-intl';
 import { ReactNode, useEffect, useState } from 'react';
 import { ServiceWorkerRegistration } from './ServiceWorkerRegistration';
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider';
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { InstallPrompt } from '@/components/pwa/InstallPrompt';
+import { OfflineQueueManager } from '@/components/features/OfflineQueueManager';
 
 // Initial French messages to prevent "context not found" error
 const initialFrenchMessages = {
@@ -89,8 +91,10 @@ export function Providers({ children }: { children: ReactNode }) {
     <SessionProvider>
       <NextIntlClientProvider locale={locale} messages={messagesToUse}>
         <AnalyticsProvider>
+          <GoogleAnalytics />
           <ServiceWorkerRegistration />
           <InstallPrompt />
+          <OfflineQueueManager />
           {children}
         </AnalyticsProvider>
       </NextIntlClientProvider>

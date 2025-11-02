@@ -127,6 +127,13 @@ export function ListingForm({
 
     try {
       await onSubmit(formData);
+      // Track listing creation/update
+      if (typeof window !== 'undefined') {
+        const { trackListingCreated } = require('@/lib/analytics');
+        if (mode === 'create') {
+          // Will be tracked after successful API response in parent component
+        }
+      }
     } catch (err: any) {
       setError(err.message || 'Une erreur est survenue');
     }

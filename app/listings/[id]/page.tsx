@@ -18,6 +18,7 @@ import { ReportButton } from '@/components/features/ReportButton';
 import { DiscountBadge } from '@/components/features/DiscountBadge';
 import { QuestionsSection } from '@/components/features/QuestionsSection';
 import { ShareButtons } from '@/components/features/ShareButtons';
+import { TrackListingView } from '@/components/features/TrackListingView';
 import { isPromotionActive, getEffectivePrice } from '@/lib/promotions';
 
 async function getListing(id: string) {
@@ -133,6 +134,7 @@ export default async function ListingDetailPage({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <TrackListingView listingId={listing.id} listingTitle={listing.title} />
       <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="grid md:grid-cols-2 gap-8">

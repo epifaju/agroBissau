@@ -7,6 +7,7 @@ import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { trackSearch } from '@/lib/analytics';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -41,6 +42,15 @@ export function SearchBar({
   }, []);
 
   const handleSearch = (searchQuery: string) => {
+    // Track search event
+    if (searchQuery.trim()) {
+      trackSearch(searchQuery.trim(), {
+        category: searchParams.get('category') || undefined,
+        city: searchParams.get('city') || undefined,
+        type: searchParams.get('type') || undefined,
+      });
+    }
+
     if (onSearch) {
       onSearch(searchQuery);
     } else {

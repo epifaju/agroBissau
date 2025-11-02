@@ -149,25 +149,25 @@ export default async function HomePage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-green-50 to-white py-20">
+      <section className="bg-gradient-to-b from-green-50 to-white py-12 md:py-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6">
             {t('title')}
             <span className="text-green-600 block mt-2">{t('titleSub')}</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8 max-w-2xl mx-auto">
             {t('subtitle')}
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
             <Link 
               href="/register"
-              className="inline-flex items-center justify-center h-11 rounded-md px-8 bg-green-600 text-white hover:bg-green-700 text-sm font-medium transition-colors"
+              className="inline-flex items-center justify-center h-11 rounded-md px-6 md:px-8 bg-green-600 text-white hover:bg-green-700 text-sm font-medium transition-colors"
             >
               {t('cta')}
             </Link>
             <Link 
               href="/listings"
-              className="inline-flex items-center justify-center h-11 rounded-md px-8 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
+              className="inline-flex items-center justify-center h-11 rounded-md px-6 md:px-8 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
             >
               {t('ctaSecondary')}
             </Link>
@@ -177,9 +177,9 @@ export default async function HomePage() {
 
       {/* Featured Listings */}
       {featuredListings.length > 0 && (
-        <section className="py-20 container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold">{t('featured')}</h2>
+        <section className="py-12 md:py-20 container mx-auto px-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold">{t('featured')}</h2>
             <Link 
               href="/listings"
               className="inline-flex items-center justify-center h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors"
@@ -187,7 +187,7 @@ export default async function HomePage() {
               {t('viewAllListings')}
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {featuredListings.map((listing) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
@@ -197,10 +197,10 @@ export default async function HomePage() {
 
       {/* Latest Listings */}
       {latestListings.length > 0 && (
-        <section className="py-20 bg-gray-50">
+        <section className="py-12 md:py-20 bg-gray-50">
           <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-bold">{t('latest')}</h2>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold">{t('latest')}</h2>
               <Link 
                 href="/listings"
                 className="inline-flex items-center justify-center h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors"
@@ -208,7 +208,7 @@ export default async function HomePage() {
                 {t('viewAllListings')}
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {latestListings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}
@@ -218,35 +218,35 @@ export default async function HomePage() {
       )}
 
       {/* Global Stats */}
-      <section className="py-16 bg-green-600 text-white">
+      <section className="py-12 md:py-16 bg-green-600 text-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold mb-2">
+              <div className="text-3xl md:text-4xl font-bold mb-2">
                 {globalStats.totalListings.toLocaleString('fr-FR')}
               </div>
-              <p className="text-green-100">{t('stats.activeListings')}</p>
+              <p className="text-green-100 text-sm md:text-base">{t('stats.activeListings')}</p>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">
+              <div className="text-3xl md:text-4xl font-bold mb-2">
                 {globalStats.totalUsers.toLocaleString('fr-FR')}
               </div>
-              <p className="text-green-100">{t('stats.activeUsers')}</p>
+              <p className="text-green-100 text-sm md:text-base">{t('stats.activeUsers')}</p>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">100%</div>
-              <p className="text-green-100">{t('stats.satisfaction')}</p>
+              <div className="text-3xl md:text-4xl font-bold mb-2">100%</div>
+              <p className="text-green-100 text-sm md:text-base">{t('stats.satisfaction')}</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features */}
-      <section className="py-20 container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">
+      <section className="py-12 md:py-20 container mx-auto px-4">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
           {t('features.title')}
         </h2>
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
           <Card>
             <CardContent className="pt-6">
               <div className="text-4xl mb-4">🌱</div>
@@ -278,15 +278,15 @@ export default async function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-green-600 text-white py-16">
+      <section className="bg-green-600 text-white py-12 md:py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">{t('ctaSection.title')}</h2>
-          <p className="text-green-100 mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">{t('ctaSection.title')}</h2>
+          <p className="text-green-100 mb-6 md:mb-8 text-sm md:text-base">
             {t('ctaSection.description')}
           </p>
           <Link 
             href="/register"
-            className="inline-flex items-center justify-center h-11 rounded-md px-8 bg-gray-200 text-gray-900 hover:bg-gray-300 text-sm font-medium transition-colors"
+            className="inline-flex items-center justify-center h-11 rounded-md px-6 md:px-8 bg-gray-200 text-gray-900 hover:bg-gray-300 text-sm font-medium transition-colors"
           >
             {t('ctaSection.button')}
           </Link>
@@ -294,9 +294,9 @@ export default async function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8">
+      <footer className="bg-gray-900 text-white py-6 md:py-8">
         <div className="container mx-auto px-4 text-center">
-          <p>{t('footer.copyright')}</p>
+          <p className="text-sm md:text-base">{t('footer.copyright')}</p>
         </div>
       </footer>
     </div>

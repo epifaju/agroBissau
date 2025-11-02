@@ -122,7 +122,7 @@ export function ChatList({
 
   if (loading) {
     return (
-      <div className="p-4 text-center text-gray-500">
+      <div className="p-3 md:p-4 text-center text-gray-500">
         <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
       </div>
     );
@@ -130,9 +130,9 @@ export function ChatList({
 
   if (conversations.length === 0) {
     return (
-      <div className="p-8 text-center text-gray-500">
-        <p>{t('noConversations')}</p>
-        <p className="text-sm mt-2">{t('noConversationsDescription')}</p>
+      <div className="p-6 md:p-8 text-center text-gray-500">
+        <p className="text-sm md:text-base">{t('noConversations')}</p>
+        <p className="text-xs md:text-sm mt-2">{t('noConversationsDescription')}</p>
       </div>
     );
   }
@@ -148,33 +148,33 @@ export function ChatList({
         return (
           <Card
             key={conversation.otherUser.id}
-            className={`cursor-pointer hover:bg-gray-50 transition-colors ${
+            className={`cursor-pointer hover:bg-gray-50 transition-colors touch-target ${
               isSelected ? 'ring-2 ring-green-600' : ''
             }`}
             onClick={() => onSelectConversation(conversation.otherUser.id)}
           >
-            <CardContent className="p-4">
-              <div className="flex gap-3">
-                <Avatar>
+            <CardContent className="p-3 md:p-4">
+              <div className="flex gap-2 md:gap-3">
+                <Avatar className="h-10 w-10 md:h-12 md:w-12 flex-shrink-0">
                   <AvatarImage src={conversation.otherUser.avatar} />
-                  <AvatarFallback>{otherUserInitials}</AvatarFallback>
+                  <AvatarFallback className="text-xs md:text-sm">{otherUserInitials}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="font-semibold truncate">
+                    <p className="font-semibold truncate text-sm md:text-base">
                       {conversation.otherUser.firstName}{' '}
                       {conversation.otherUser.lastName}
                     </p>
                     {conversation.unreadCount > 0 && (
-                      <Badge className="bg-green-600">
+                      <Badge className="bg-green-600 text-xs flex-shrink-0">
                         {conversation.unreadCount}
                       </Badge>
                     )}
                   </div>
                   {conversation.lastMessage && (
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <p
-                        className={`text-sm truncate ${
+                        className={`text-xs md:text-sm truncate ${
                           isLastMessageFromOther && conversation.unreadCount > 0
                             ? 'font-semibold text-gray-900'
                             : 'text-gray-600'
@@ -184,7 +184,7 @@ export function ChatList({
                         {conversation.lastMessage.content}
                       </p>
                       {conversation.lastMessage && (
-                        <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
+                        <span className="text-xs text-gray-400 flex-shrink-0">
                           {formatRelativeTime(conversation.lastMessage.createdAt)}
                         </span>
                       )}

@@ -55,48 +55,48 @@ export function ListingCard({ listing }: ListingCardProps) {
                 alt={listing.title}
                 width={400}
                 height={250}
-                className="w-full h-48 object-cover rounded-t-lg"
+                className="w-full h-48 md:h-52 object-cover rounded-t-lg"
                 unoptimized
               />
           ) : (
-            <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-lg">
+            <div className="w-full h-48 md:h-52 bg-gray-200 flex items-center justify-center rounded-t-lg">
               <span className="text-gray-400 text-4xl">🌾</span>
             </div>
           )}
           {listing.isFeatured && (
-            <Badge className="absolute top-2 left-2 z-10">Featured</Badge>
+            <Badge className="absolute top-2 left-2 z-10 text-xs">Featured</Badge>
           )}
           {isPromotion && priceInfo.percent > 0 && (
             <DiscountBadge discountPercent={priceInfo.percent} size="sm" className="absolute top-2 left-2 z-10" />
           )}
         </div>
-        <CardContent className="p-4">
-          <h3 className="font-semibold text-lg mb-2 line-clamp-2">{listing.title}</h3>
+        <CardContent className="p-3 md:p-4">
+          <h3 className="font-semibold text-base md:text-lg mb-2 line-clamp-2">{listing.title}</h3>
           <div className="mb-2">
             {isPromotion && priceInfo.original > priceInfo.discounted ? (
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <p className="text-green-600 font-bold text-xl">
+                  <p className="text-green-600 font-bold text-lg md:text-xl">
                     {formatPrice(priceInfo.discounted)} / {listing.unit}
                   </p>
                   <DiscountBadge discountPercent={priceInfo.percent} size="sm" />
                 </div>
-                <p className="text-gray-400 line-through text-sm">
+                <p className="text-gray-400 line-through text-xs md:text-sm">
                   {formatPrice(priceInfo.original)} / {listing.unit}
                 </p>
               </div>
             ) : (
-              <p className="text-green-600 font-bold text-xl">
+              <p className="text-green-600 font-bold text-lg md:text-xl">
                 {formatPrice(listing.price)} / {listing.unit}
               </p>
             )}
           </div>
-          <p className="text-gray-600 text-sm mb-3">{locationText}</p>
+          <p className="text-gray-600 text-xs md:text-sm mb-3">{locationText}</p>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
+              <Avatar className="h-7 w-7 md:h-8 md:w-8">
                 <AvatarImage src={listing.user.avatar} />
-                <AvatarFallback>{userInitials}</AvatarFallback>
+                <AvatarFallback className="text-xs md:text-sm">{userInitials}</AvatarFallback>
               </Avatar>
               {listing.user.id ? (
                 <span
@@ -105,12 +105,12 @@ export function ListingCard({ listing }: ListingCardProps) {
                     e.stopPropagation();
                     window.location.href = `/profile/${listing.user.id}`;
                   }}
-                  className="text-sm text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
+                  className="text-xs md:text-sm text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
                 >
                   {listing.user.firstName} {listing.user.lastName}
                 </span>
               ) : (
-                <span className="text-sm text-gray-600">
+                <span className="text-xs md:text-sm text-gray-600">
                   {listing.user.firstName} {listing.user.lastName}
                 </span>
               )}

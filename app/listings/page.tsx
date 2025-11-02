@@ -40,23 +40,23 @@ export default async function ListingsPage() {
     <div className="min-h-screen bg-gray-50">
       <Header />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Annonces</h1>
-          <Link href="/listings/create">
-            <Button>Créer une annonce</Button>
+      <div className="container mx-auto px-4 py-4 md:py-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold">Annonces</h1>
+          <Link href="/listings/create" className="w-full sm:w-auto">
+            <Button className="w-full sm:w-auto">Créer une annonce</Button>
           </Link>
         </div>
 
         {listings.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-600 text-lg mb-4">Aucune annonce disponible pour le moment.</p>
+            <p className="text-gray-600 text-base md:text-lg mb-4">Aucune annonce disponible pour le moment.</p>
             <Link href="/listings/create">
               <Button>Soyez le premier à créer une annonce!</Button>
             </Link>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {listings.map((listing) => (
               <ListingCard
                 key={listing.id}

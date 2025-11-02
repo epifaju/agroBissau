@@ -136,8 +136,8 @@ export default async function ListingDetailPage({
     <div className="min-h-screen bg-gray-50">
       <TrackListingView listingId={listing.id} listingTitle={listing.title} />
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 gap-8">
+      <div className="container mx-auto px-4 py-4 md:py-8">
+        <div className="grid lg:grid-cols-2 gap-6 md:gap-8">
           {/* Images */}
           <div>
             {listing.images && listing.images.length > 0 ? (
@@ -146,18 +146,18 @@ export default async function ListingDetailPage({
                 alt={listing.title}
                 width={600}
                 height={400}
-                className="w-full h-96 object-cover rounded-lg"
+                className="w-full h-64 md:h-96 object-cover rounded-lg"
                 unoptimized
               />
             ) : (
-              <div className="w-full h-96 bg-gray-200 flex items-center justify-center rounded-lg">
-                <span className="text-gray-400 text-8xl">🌾</span>
+              <div className="w-full h-64 md:h-96 bg-gray-200 flex items-center justify-center rounded-lg">
+                <span className="text-gray-400 text-6xl md:text-8xl">🌾</span>
               </div>
             )}
           </div>
 
           {/* Details */}
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <Badge variant="secondary">{listing.category.name}</Badge>
@@ -166,17 +166,17 @@ export default async function ListingDetailPage({
                   <DiscountBadge discountPercent={priceInfo.percent} size="md" />
                 )}
               </div>
-              <h1 className="text-3xl font-bold mb-4">{listing.title}</h1>
-              <div className="mb-4">
+              <h1 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4">{listing.title}</h1>
+              <div className="mb-3 md:mb-4">
                 {isPromotion && priceInfo.original > priceInfo.discounted ? (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <p className="text-green-600 font-bold text-3xl">
+                    <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+                      <p className="text-green-600 font-bold text-2xl md:text-3xl">
                         {formatPrice(priceInfo.discounted)} / {listing.unit}
                       </p>
                       <DiscountBadge discountPercent={priceInfo.percent} size="lg" />
                     </div>
-                    <p className="text-gray-400 line-through text-xl">
+                    <p className="text-gray-400 line-through text-lg md:text-xl">
                       {formatPrice(priceInfo.original)} / {listing.unit}
                     </p>
                     <p className="text-sm text-gray-600">
@@ -187,57 +187,59 @@ export default async function ListingDetailPage({
                     </p>
                   </div>
                 ) : (
-                  <p className="text-green-600 font-bold text-3xl">
+                  <p className="text-green-600 font-bold text-2xl md:text-3xl">
                     {formatPrice(listing.price)} / {listing.unit}
                   </p>
                 )}
               </div>
-              <p className="text-gray-600 mb-2">
+              <p className="text-gray-600 text-sm md:text-base mb-2">
                 {t('availableQuantity')}: <span className="font-semibold">{listing.quantity} {listing.unit}</span>
               </p>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-sm md:text-base">
                 📍 {locationText}
               </p>
             </div>
 
             <Card>
-              <CardContent className="p-6">
-                <h2 className="font-semibold mb-4">{t('description')}</h2>
-                <p className="text-gray-700 whitespace-pre-wrap">{listing.description}</p>
+              <CardContent className="p-4 md:p-6">
+                <h2 className="font-semibold mb-3 md:mb-4">{t('description')}</h2>
+                <p className="text-gray-700 whitespace-pre-wrap text-sm md:text-base">{listing.description}</p>
               </CardContent>
             </Card>
 
             {/* Map */}
             <Card>
-              <CardContent className="p-6">
-                <h2 className="font-semibold mb-4">{t('location')}</h2>
-                <ListingMap
-                  location={listing.location as any}
-                  title={listing.title}
-                  height="350px"
-                />
+              <CardContent className="p-4 md:p-6">
+                <h2 className="font-semibold mb-3 md:mb-4">{t('location')}</h2>
+                <div className="h-[250px] md:h-[350px]">
+                  <ListingMap
+                    location={listing.location as any}
+                    title={listing.title}
+                    height="100%"
+                  />
+                </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 md:p-6">
                 <Link
                   href={`/profile/${listing.user.id}`}
-                  className="flex items-center gap-4 mb-4 hover:opacity-80 transition-opacity"
+                  className="flex items-center gap-3 md:gap-4 mb-3 md:mb-4 hover:opacity-80 transition-opacity"
                 >
-                  <Avatar className="h-12 w-12">
+                  <Avatar className="h-10 w-10 md:h-12 md:w-12">
                     <AvatarImage src={listing.user.avatar || undefined} />
                     <AvatarFallback>{userInitials}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold">
+                    <p className="font-semibold text-sm md:text-base">
                       {listing.user.firstName} {listing.user.lastName}
                     </p>
-                    <p className="text-sm text-gray-600">{t('seller')}</p>
+                    <p className="text-xs md:text-sm text-gray-600">{t('seller')}</p>
                   </div>
                 </Link>
                 <Link href={`/profile/${listing.user.id}`}>
-                  <Button variant="outline" className="w-full mb-2">
+                  <Button variant="outline" className="w-full mb-2 text-sm md:text-base">
                     {t('viewProfile')}
                   </Button>
                 </Link>
@@ -259,7 +261,7 @@ export default async function ListingDetailPage({
                 </div>
 
                 {/* Partage Social */}
-                <div className="mt-6 pt-6 border-t">
+                <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t">
                   <ShareButtons
                     url={getAbsoluteUrl(`/listings/${listing.id}`)}
                     title={listing.title}
@@ -272,7 +274,7 @@ export default async function ListingDetailPage({
               </CardContent>
             </Card>
 
-            <div className="text-sm text-gray-500">
+            <div className="text-xs md:text-sm text-gray-500">
               {t('publishedOn')} {formatDate(listing.createdAt)}
             </div>
           </div>

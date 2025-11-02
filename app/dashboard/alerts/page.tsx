@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -61,6 +60,7 @@ export default function AlertsPage() {
       fetchAlerts();
       fetchCategories();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   const fetchAlerts = async () => {
@@ -207,18 +207,16 @@ export default function AlertsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">{t('title')}</h1>
-            <p className="text-gray-600 mt-2">
+      <div className="p-4 md:p-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
+          <div className="flex-1">
+            <h1 className="text-2xl md:text-3xl font-bold">{t('title')}</h1>
+            <p className="text-gray-600 mt-2 text-sm md:text-base">
               {t('description')}
             </p>
           </div>
           {!showForm && (
-            <Button onClick={() => setShowForm(true)}>
+            <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               {t('create')}
             </Button>
@@ -227,30 +225,31 @@ export default function AlertsPage() {
 
         {/* Form */}
         {showForm && (
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>
+          <Card className="mb-6 md:mb-8">
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="text-lg md:text-xl">
                 {editingAlert ? t('editTitle') : t('newTitle')}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+            <CardContent className="p-4 md:p-6">
+              <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
                 <div>
-                  <Label htmlFor="title">{t('titleLabel')} *</Label>
+                  <Label htmlFor="title" className="text-sm md:text-base">{t('titleLabel')} *</Label>
                   <Input
                     id="title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder={t('titlePlaceholder')}
                     required
+                    className="mt-1"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="category">{tFilters('category')}</Label>
+                    <Label htmlFor="category" className="text-sm md:text-base">{tFilters('category')}</Label>
                     <Select value={categoryId || 'all'} onValueChange={(v) => setCategoryId(v === 'all' ? '' : v)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="mt-1">
                         <SelectValue placeholder={tFilters('allCategories')} />
                       </SelectTrigger>
                       <SelectContent>
@@ -265,21 +264,22 @@ export default function AlertsPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="city">{tFilters('city')}</Label>
+                    <Label htmlFor="city" className="text-sm md:text-base">{tFilters('city')}</Label>
                     <Input
                       id="city"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       placeholder={t('cityPlaceholder')}
+                      className="mt-1"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="type">{tFilters('type')}</Label>
+                    <Label htmlFor="type" className="text-sm md:text-base">{tFilters('type')}</Label>
                     <Select value={type || 'all'} onValueChange={(v) => setType(v === 'all' ? '' : (v as any))}>
-                      <SelectTrigger>
+                      <SelectTrigger className="mt-1">
                         <SelectValue placeholder={tFilters('allTypes')} />
                       </SelectTrigger>
                       <SelectContent>
@@ -291,9 +291,9 @@ export default function AlertsPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="frequency">{t('frequencyLabel')} *</Label>
+                    <Label htmlFor="frequency" className="text-sm md:text-base">{t('frequencyLabel')} *</Label>
                     <Select value={frequency} onValueChange={(v) => setFrequency(v as any)} required>
-                      <SelectTrigger>
+                      <SelectTrigger className="mt-1">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -307,33 +307,35 @@ export default function AlertsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="minPrice">{tFilters('minPrice')}</Label>
+                    <Label htmlFor="minPrice" className="text-sm md:text-base">{tFilters('minPrice')}</Label>
                     <Input
                       id="minPrice"
                       type="number"
                       value={minPrice}
                       onChange={(e) => setMinPrice(e.target.value)}
                       placeholder={t('pricePlaceholder')}
+                      className="mt-1"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="maxPrice">{tFilters('maxPrice')}</Label>
+                    <Label htmlFor="maxPrice" className="text-sm md:text-base">{tFilters('maxPrice')}</Label>
                     <Input
                       id="maxPrice"
                       type="number"
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(e.target.value)}
                       placeholder={t('pricePlaceholder')}
+                      className="mt-1"
                     />
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <Button type="submit">
+                <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                  <Button type="submit" className="w-full sm:w-auto">
                     {editingAlert ? t('update') : t('createButton')}
                   </Button>
-                  <Button type="button" variant="outline" onClick={resetForm}>
+                  <Button type="button" variant="outline" onClick={resetForm} className="w-full sm:w-auto">
                     {t('cancel')}
                   </Button>
                 </div>
@@ -345,46 +347,46 @@ export default function AlertsPage() {
         {/* Alerts List */}
         {alerts.length === 0 ? (
           <Card>
-            <CardContent className="p-12 text-center">
-              <Bell className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600 mb-4">
+            <CardContent className="p-8 md:p-12 text-center">
+              <Bell className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-gray-400" />
+              <p className="text-gray-600 mb-4 text-sm md:text-base">
                 {t('empty')}
               </p>
-              <Button onClick={() => setShowForm(true)}>
+              <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" />
                 {t('createFirst')}
               </Button>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-3 md:gap-4">
             {alerts.map((alert) => {
               const criteria = alert.criteria as any;
               return (
                 <Card key={alert.id}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="text-lg font-semibold">{alert.title}</h3>
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-start gap-4">
+                      <div className="flex-1 w-full">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <h3 className="text-base md:text-lg font-semibold">{alert.title}</h3>
                           {alert.isActive ? (
-                            <Badge className="bg-green-100 text-green-800">
+                            <Badge className="bg-green-100 text-green-800 text-xs">
                               <Check className="w-3 h-3 mr-1" />
                               {t('active')}
                             </Badge>
                           ) : (
-                            <Badge variant="secondary">
+                            <Badge variant="secondary" className="text-xs">
                               <X className="w-3 h-3 mr-1" />
                               {t('inactive')}
                             </Badge>
                           )}
-                          <Badge variant="outline">
+                          <Badge variant="outline" className="text-xs">
                             {alert.frequency === 'daily' && t('frequencyDaily')}
                             {alert.frequency === 'weekly' && t('frequencyWeekly')}
                             {alert.frequency === 'instant' && t('frequencyInstant')}
                           </Badge>
                         </div>
-                        <div className="text-sm text-gray-600 space-y-1">
+                        <div className="text-xs md:text-sm text-gray-600 space-y-1">
                           {criteria.categoryId && (
                             <p>{tFilters('category')}: {categories.find(c => c.id === criteria.categoryId)?.name || criteria.categoryId}</p>
                           )}
@@ -402,18 +404,21 @@ export default function AlertsPage() {
                           )}
                         </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 w-full sm:w-auto flex-shrink-0">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleToggle(alert)}
+                          className="flex-1 sm:flex-initial"
                         >
-                          {alert.isActive ? t('deactivate') : t('activate')}
+                          <span className="hidden sm:inline">{alert.isActive ? t('deactivate') : t('activate')}</span>
+                          <span className="sm:hidden text-xs">{alert.isActive ? t('deactivate').substring(0, 4) : t('activate').substring(0, 4)}</span>
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleEdit(alert)}
+                          className="touch-target flex-shrink-0"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -421,6 +426,7 @@ export default function AlertsPage() {
                           variant="destructive"
                           size="sm"
                           onClick={() => handleDelete(alert.id)}
+                          className="touch-target flex-shrink-0"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

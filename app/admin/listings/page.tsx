@@ -22,8 +22,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Search, ChevronLeft, ChevronRight, CheckCircle, XCircle, Trash2, Eye } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, CheckCircle, XCircle, Trash2, Eye, Package, Tag, Calendar, User } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface Listing {
   id: string;
@@ -185,32 +186,32 @@ export default function AdminListingsPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Modération des Annonces</h1>
-        <p className="text-gray-600 mt-2">
+      <div className="mb-4 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Modération des Annonces</h1>
+        <p className="text-gray-600 mt-2 text-sm md:text-base">
           {total} annonce{total > 1 ? 's' : ''} au total
         </p>
       </div>
 
       {/* Filtres */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Filtres</CardTitle>
+      <Card className="mb-4 md:mb-6">
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="text-base md:text-lg">Filtres</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <CardContent className="p-4 md:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Rechercher (titre)..."
+                placeholder="Rechercher..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm md:text-base"
               />
             </div>
             <Select value={statusFilter || "all"} onValueChange={(value) => setStatusFilter(value === "all" ? "" : value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Tous les statuts" />
+              <SelectTrigger className="text-sm md:text-base">
+                <SelectValue placeholder="Statut" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous les statuts</SelectItem>
@@ -222,8 +223,8 @@ export default function AdminListingsPage() {
               </SelectContent>
             </Select>
             <Select value={categoryFilter || "all"} onValueChange={(value) => setCategoryFilter(value === "all" ? "" : value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Toutes les catégories" />
+              <SelectTrigger className="text-sm md:text-base">
+                <SelectValue placeholder="Catégorie" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toutes les catégories</SelectItem>
@@ -237,8 +238,9 @@ export default function AdminListingsPage() {
             <Button
               variant={needsModeration ? 'default' : 'outline'}
               onClick={() => setNeedsModeration(!needsModeration)}
+              className="text-sm md:text-base"
             >
-              {needsModeration ? '✓ Nécessite modération' : 'Nécessite modération'}
+              {needsModeration ? '✓ Modération' : 'Modération'}
             </Button>
           </div>
         </CardContent>
@@ -255,7 +257,8 @@ export default function AdminListingsPage() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
+              {/* Desktop Table */}
+              <div className="hidden lg:block overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -332,28 +335,132 @@ export default function AdminListingsPage() {
                 </Table>
               </div>
 
+              {/* Mobile Cards */}
+              <div className="lg:hidden p-4 space-y-4">
+                {listings.map((listing) => {
+                  const userInitials = `${listing.user.firstName[0] || ''}${listing.user.lastName[0] || ''}`;
+                  return (
+                    <div key={listing.id} className="border rounded-lg p-4 space-y-3">
+                      <div>
+                        <h3 className="font-semibold text-sm md:text-base mb-1">
+                          {listing.title}
+                        </h3>
+                        <div className="text-xs text-gray-500 truncate">
+                          {listing.description.substring(0, 100)}...
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={listing.user.avatar} />
+                          <AvatarFallback className="text-xs">{userInitials}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {listing.user.firstName} {listing.user.lastName}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">{listing.user.email}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">Catégorie</p>
+                          <Badge variant="outline" className="text-xs">
+                            <Tag className="w-3 h-3 mr-1" />
+                            {listing.category.name}
+                          </Badge>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">Statut</p>
+                          {getStatusBadge(listing.status)}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <p className="text-gray-500">Prix</p>
+                          <p className="font-medium text-green-600">
+                            {formatPrice(Number(listing.price))} / {listing.unit}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Date</p>
+                          <p className="font-medium">
+                            {new Date(listing.createdAt).toLocaleDateString('fr-FR')}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 pt-2 border-t">
+                        <Link href={`/listings/${listing.id}`} className="flex-1">
+                          <Button size="sm" variant="outline" className="w-full">
+                            <Eye className="w-4 h-4 mr-1" />
+                            Voir
+                          </Button>
+                        </Link>
+                        {listing.status === 'SUSPENDED' && (
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => handleModerate(listing.id, 'ACTIVE')}
+                            disabled={updating === listing.id}
+                            className="flex-1"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Approuver
+                          </Button>
+                        )}
+                        {listing.status === 'ACTIVE' && (
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleModerate(listing.id, 'SUSPENDED')}
+                            disabled={updating === listing.id}
+                            className="flex-1"
+                          >
+                            <XCircle className="w-4 h-4 mr-1" />
+                            Suspendre
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDelete(listing.id)}
+                          disabled={updating === listing.id}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
               {/* Pagination */}
-              <div className="flex items-center justify-between p-4 border-t">
-                <div className="text-sm text-gray-600">
+              <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-t gap-3 md:gap-0">
+                <div className="text-xs md:text-sm text-gray-600">
                   Page {page} sur {totalPages} ({total} annonces)
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 w-full sm:w-auto">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setPage(Math.max(1, page - 1))}
                     disabled={page === 1}
+                    className="flex-1 sm:flex-initial"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    Précédent
+                    <span className="hidden sm:inline ml-1">Précédent</span>
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setPage(Math.min(totalPages, page + 1))}
                     disabled={page === totalPages}
+                    className="flex-1 sm:flex-initial"
                   >
-                    Suivant
+                    <span className="hidden sm:inline mr-1">Suivant</span>
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>

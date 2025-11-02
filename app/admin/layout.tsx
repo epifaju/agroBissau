@@ -1,17 +1,8 @@
 import { ReactNode } from 'react';
-import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { LogoutButton } from '@/components/admin/LogoutButton';
-import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
-  BarChart3,
-  Flag,
-} from 'lucide-react';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 export default async function AdminLayout({
   children,
@@ -25,55 +16,13 @@ export default async function AdminLayout({
     redirect('/dashboard');
   }
 
-  const navItems = [
-    { href: '/admin', label: 'Tableau de bord', icon: LayoutDashboard },
-    { href: '/admin/users', label: 'Utilisateurs', icon: Users },
-    { href: '/admin/listings', label: 'Annonces', icon: FileText },
-    { href: '/admin/reports', label: 'Rapports', icon: Flag },
-    { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200">
-        <div className="p-6 border-b border-gray-200">
-          <Link href="/admin" className="text-2xl font-bold text-green-600">
-            🌾 AgroBissau
-          </Link>
-          <p className="text-sm text-gray-500 mt-1">Administration</p>
-        </div>
-        
-        <nav className="p-4 space-y-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                >
-                  <Icon className="w-4 h-4 mr-2" />
-                  {item.label}
-                </Button>
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="absolute bottom-4 left-4 right-4 space-y-2">
-          <Link href="/dashboard">
-            <Button variant="outline" className="w-full justify-start">
-              Retour au dashboard
-            </Button>
-          </Link>
-          <LogoutButton />
-        </div>
-      </aside>
-
+      <AdminSidebar />
+      
       {/* Main Content */}
-      <main className="ml-64">
-        <div className="p-8">
+      <main className="lg:ml-64">
+        <div className="p-4 md:p-8">
           {children}
         </div>
       </main>

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useNotifications } from '@/hooks/useNotifications';
-import { Header } from '@/components/layout/Header';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -69,29 +68,29 @@ export default function NotificationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Bell className="w-8 h-8" />
+      <div className="p-4 md:p-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 md:mb-6">
+          <div className="flex-1">
+            <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
+              <Bell className="w-6 h-6 md:w-8 md:h-8" />
               Notifications
             </h1>
             {unreadCount > 0 && (
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 mt-1 text-sm md:text-base">
                 {unreadCount} notification{unreadCount > 1 ? 's' : ''} non lue{unreadCount > 1 ? 's' : ''}
               </p>
             )}
           </div>
           {unreadCount > 0 && (
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={handleSelectAll} size="sm">
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Button variant="outline" onClick={handleSelectAll} size="sm" className="w-full sm:w-auto">
                 Tout sélectionner
               </Button>
               {selectedIds.length > 0 && (
                 <Button
                   onClick={() => handleMarkAsRead(selectedIds)}
                   size="sm"
+                  className="w-full sm:w-auto"
                 >
                   <CheckCheck className="w-4 h-4 mr-2" />
                   Marquer comme lues ({selectedIds.length})
@@ -103,17 +102,17 @@ export default function NotificationsPage() {
 
         {notifications.length === 0 ? (
           <Card>
-            <CardContent className="p-8 text-center text-gray-500">
-              <Bell className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <p>Aucune notification pour le moment.</p>
+            <CardContent className="p-8 md:p-12 text-center text-gray-500">
+              <Bell className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-gray-400" />
+              <p className="text-sm md:text-base">Aucune notification pour le moment.</p>
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2 md:space-y-3">
             {notifications.map((notification) => (
               <Card
                 key={notification.id}
-                className={`cursor-pointer hover:shadow-md transition-shadow ${
+                className={`cursor-pointer hover:shadow-md transition-shadow touch-target ${
                   !notification.isRead ? 'border-l-4 border-l-green-600' : ''
                 }`}
                 onClick={() => {
@@ -122,29 +121,29 @@ export default function NotificationsPage() {
                   }
                 }}
               >
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-2xl">
+                <CardContent className="p-3 md:p-4">
+                  <div className="flex items-start gap-2 md:gap-4">
+                    <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-100 flex items-center justify-center text-xl md:text-2xl">
                       {getTypeIcon(notification.type)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold">{notification.title}</h3>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <h3 className="font-semibold text-sm md:text-base">{notification.title}</h3>
                             {!notification.isRead && (
-                              <span className="w-2 h-2 bg-green-600 rounded-full"></span>
+                              <span className="w-2 h-2 bg-green-600 rounded-full flex-shrink-0"></span>
                             )}
-                            <Badge className={getTypeColor(notification.type)}>
+                            <Badge className={`${getTypeColor(notification.type)} text-xs flex-shrink-0`}>
                               {notification.type}
                             </Badge>
                           </div>
-                          <p className="text-gray-700 mb-2">{notification.message}</p>
+                          <p className="text-gray-700 mb-2 text-xs md:text-sm">{notification.message}</p>
                           <p className="text-xs text-gray-500">
                             {formatDate(new Date(notification.createdAt))}
                           </p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           <input
                             type="checkbox"
                             checked={selectedIds.includes(notification.id)}
@@ -156,10 +155,10 @@ export default function NotificationsPage() {
                               }
                             }}
                             onClick={(e) => e.stopPropagation()}
-                            className="w-5 h-5"
+                            className="w-5 h-5 cursor-pointer"
                           />
                           {notification.isRead && (
-                            <Check className="w-5 h-5 text-green-600" />
+                            <Check className="w-4 h-4 md:w-5 md:h-5 text-green-600 flex-shrink-0" />
                           )}
                         </div>
                       </div>

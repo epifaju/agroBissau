@@ -21,7 +21,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Search, ChevronLeft, ChevronRight, UserCheck, UserX } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, UserCheck, UserX, User, Mail, Calendar } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface User {
   id: string;
@@ -121,32 +122,32 @@ export default function AdminUsersPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Gestion des Utilisateurs</h1>
-        <p className="text-gray-600 mt-2">
+      <div className="mb-4 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Gestion des Utilisateurs</h1>
+        <p className="text-gray-600 mt-2 text-sm md:text-base">
           {total} utilisateur{total > 1 ? 's' : ''} au total
         </p>
       </div>
 
       {/* Filtres */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Filtres</CardTitle>
+      <Card className="mb-4 md:mb-6">
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="text-base md:text-lg">Filtres</CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSearch} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <CardContent className="p-4 md:p-6">
+          <form onSubmit={handleSearch} className="space-y-3 md:space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Rechercher (email, nom)..."
+                  placeholder="Rechercher..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 text-sm md:text-base"
                 />
               </div>
               <Select value={roleFilter || "all"} onValueChange={(value) => setRoleFilter(value === "all" ? "" : value)}>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm md:text-base">
                   <SelectValue placeholder="Tous les rôles" />
                 </SelectTrigger>
                 <SelectContent>
@@ -157,8 +158,8 @@ export default function AdminUsersPage() {
                 </SelectContent>
               </Select>
               <Select value={isActiveFilter || "all"} onValueChange={(value) => setIsActiveFilter(value === "all" ? "" : value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Tous les statuts" />
+                <SelectTrigger className="text-sm md:text-base">
+                  <SelectValue placeholder="Statut" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous les statuts</SelectItem>
@@ -167,11 +168,11 @@ export default function AdminUsersPage() {
                 </SelectContent>
               </Select>
               <Select value={subscriptionFilter || "all"} onValueChange={(value) => setSubscriptionFilter(value === "all" ? "" : value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Tous les abonnements" />
+                <SelectTrigger className="text-sm md:text-base">
+                  <SelectValue placeholder="Abonnement" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous les abonnements</SelectItem>
+                  <SelectItem value="all">Tous</SelectItem>
                   <SelectItem value="FREE">Gratuit</SelectItem>
                   <SelectItem value="PREMIUM_BASIC">Premium Basic</SelectItem>
                   <SelectItem value="PREMIUM_PRO">Premium Pro</SelectItem>
@@ -179,7 +180,7 @@ export default function AdminUsersPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit">Rechercher</Button>
+            <Button type="submit" className="w-full sm:w-auto">Rechercher</Button>
           </form>
         </CardContent>
       </Card>
@@ -195,7 +196,8 @@ export default function AdminUsersPage() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
+              {/* Desktop Table */}
+              <div className="hidden lg:block overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -259,28 +261,105 @@ export default function AdminUsersPage() {
                 </Table>
               </div>
 
+              {/* Mobile Cards */}
+              <div className="lg:hidden p-4 space-y-4">
+                {users.map((user) => {
+                  const userInitials = `${user.firstName[0] || ''}${user.lastName[0] || ''}`;
+                  return (
+                    <div key={user.id} className="border rounded-lg p-4 space-y-3">
+                      <div className="flex items-start gap-3">
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage src={user.avatar} />
+                          <AvatarFallback>{userInitials}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm md:text-base truncate">
+                            {user.firstName} {user.lastName}
+                          </h3>
+                          <div className="flex items-center gap-1 text-xs text-gray-600 mt-1">
+                            <Mail className="w-3 h-3" />
+                            <span className="truncate">{user.email}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">Rôle</p>
+                          <Badge variant={user.role === 'ADMIN' ? 'default' : 'secondary'} className="text-xs">
+                            {user.role}
+                          </Badge>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">Statut</p>
+                          <Badge
+                            variant={user.isActive ? 'default' : 'destructive'}
+                            className="text-xs"
+                          >
+                            {user.isActive ? 'Actif' : 'Inactif'}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <p className="text-gray-500">Abonnement</p>
+                          <p className="font-medium">{user.subscriptionTier.replace('_', ' ')}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Annonces</p>
+                          <p className="font-medium">{user._count.listings}</p>
+                        </div>
+                      </div>
+
+                      <Button
+                        size="sm"
+                        variant={user.isActive ? 'destructive' : 'default'}
+                        onClick={() => handleToggleStatus(user.id, user.isActive)}
+                        disabled={updating === user.id}
+                        className="w-full"
+                      >
+                        {user.isActive ? (
+                          <>
+                            <UserX className="w-4 h-4 mr-1" />
+                            Désactiver
+                          </>
+                        ) : (
+                          <>
+                            <UserCheck className="w-4 h-4 mr-1" />
+                            Activer
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+
               {/* Pagination */}
-              <div className="flex items-center justify-between p-4 border-t">
-                <div className="text-sm text-gray-600">
+              <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-t gap-3 md:gap-0">
+                <div className="text-xs md:text-sm text-gray-600">
                   Page {page} sur {totalPages} ({total} utilisateurs)
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 w-full sm:w-auto">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setPage(Math.max(1, page - 1))}
                     disabled={page === 1}
+                    className="flex-1 sm:flex-initial"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    Précédent
+                    <span className="hidden sm:inline ml-1">Précédent</span>
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setPage(Math.min(totalPages, page + 1))}
                     disabled={page === totalPages}
+                    className="flex-1 sm:flex-initial"
                   >
-                    Suivant
+                    <span className="hidden sm:inline mr-1">Suivant</span>
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>

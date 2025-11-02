@@ -38,3 +38,43 @@
 
 /* Leaflet styles */
 @import 'leaflet/dist/leaflet.css';
+
+/* Mobile optimizations */
+@layer utilities {
+  /* Touch target sizes */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Mobile-friendly text sizes */
+  @media (max-width: 640px) {
+    .responsive-text {
+      font-size: 0.875rem;
+    }
+  }
+  
+  /* Safe area insets for iOS */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
+  
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Improve scrolling on mobile */
+@media (max-width: 768px) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+}

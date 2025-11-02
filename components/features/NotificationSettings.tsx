@@ -215,15 +215,15 @@ export function NotificationSettings() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="flex items-center gap-2 text-base md:text-lg">
             <Bell className="w-5 h-5" />
             Notifications Push
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-4 md:p-6 space-y-3 md:space-y-4">
           {pushSupported ? (
             <>
               <p className="text-sm text-gray-600 mb-4">
@@ -282,13 +282,14 @@ export function NotificationSettings() {
               </div>
 
               {/* Boutons d'action */}
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 {pushSubscribed ? (
                   <>
                     <Button
                       variant="outline"
                       onClick={handlePushUnsubscribe}
                       disabled={saving}
+                      className="w-full sm:w-auto"
                     >
                       Se désabonner
                     </Button>
@@ -322,13 +323,14 @@ export function NotificationSettings() {
                         }
                       }}
                       disabled={testingPush || saving}
+                      className="w-full sm:w-auto"
                     >
                       <TestTube className="w-4 h-4 mr-2" />
                       {testingPush ? 'Envoi...' : 'Tester une notification'}
                     </Button>
                   </>
                 ) : (
-                  <Button onClick={handlePushSubscribe} disabled={saving}>
+                  <Button onClick={handlePushSubscribe} disabled={saving} className="w-full sm:w-auto">
                     Activer les notifications push
                   </Button>
                 )}
@@ -343,20 +345,20 @@ export function NotificationSettings() {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="flex items-center gap-2 text-base md:text-lg">
             <Mail className="w-5 h-5" />
             Préférences de notification
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="p-4 md:p-6 space-y-5 md:space-y-6">
           {/* Email Settings */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Notifications Email</h3>
+          <div className="space-y-3 md:space-y-4">
+            <h3 className="font-semibold text-sm md:text-base">Notifications Email</h3>
             
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="emailEnabled">Activer les emails</Label>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <Label htmlFor="emailEnabled" className="text-sm md:text-base">Activer les emails</Label>
                 <p className="text-xs text-gray-500">Recevoir des notifications par email</p>
               </div>
               <input
@@ -364,53 +366,53 @@ export function NotificationSettings() {
                 id="emailEnabled"
                 checked={preferences?.emailEnabled || false}
                 onChange={(e) => handleToggle('emailEnabled', e.target.checked)}
-                className="w-5 h-5"
+                className="w-5 h-5 cursor-pointer flex-shrink-0"
               />
             </div>
 
             {preferences?.emailEnabled && (
               <div className="ml-6 space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="emailNewMessages">Nouveaux messages</Label>
+                <div className="flex items-center justify-between gap-4">
+                  <Label htmlFor="emailNewMessages" className="text-sm">Nouveaux messages</Label>
                   <input
                     type="checkbox"
                     id="emailNewMessages"
                     checked={preferences?.emailNewMessages || false}
                     onChange={(e) => handleToggle('emailNewMessages', e.target.checked)}
-                    className="w-5 h-5"
+                    className="w-5 h-5 cursor-pointer flex-shrink-0"
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="emailNewListings">Nouvelles annonces</Label>
+                <div className="flex items-center justify-between gap-4">
+                  <Label htmlFor="emailNewListings" className="text-sm">Nouvelles annonces</Label>
                   <input
                     type="checkbox"
                     id="emailNewListings"
                     checked={preferences?.emailNewListings || false}
                     onChange={(e) => handleToggle('emailNewListings', e.target.checked)}
-                    className="w-5 h-5"
+                    className="w-5 h-5 cursor-pointer flex-shrink-0"
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="emailNewReviews">Nouvelles évaluations</Label>
+                <div className="flex items-center justify-between gap-4">
+                  <Label htmlFor="emailNewReviews" className="text-sm">Nouvelles évaluations</Label>
                   <input
                     type="checkbox"
                     id="emailNewReviews"
                     checked={preferences?.emailNewReviews || false}
                     onChange={(e) => handleToggle('emailNewReviews', e.target.checked)}
-                    className="w-5 h-5"
+                    className="w-5 h-5 cursor-pointer flex-shrink-0"
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="emailPaymentUpdates">Mises à jour de paiement</Label>
+                <div className="flex items-center justify-between gap-4">
+                  <Label htmlFor="emailPaymentUpdates" className="text-sm">Mises à jour de paiement</Label>
                   <input
                     type="checkbox"
                     id="emailPaymentUpdates"
                     checked={preferences?.emailPaymentUpdates || false}
                     onChange={(e) => handleToggle('emailPaymentUpdates', e.target.checked)}
-                    className="w-5 h-5"
+                    className="w-5 h-5 cursor-pointer flex-shrink-0"
                   />
                 </div>
               </div>
@@ -418,12 +420,12 @@ export function NotificationSettings() {
           </div>
 
           {/* Push Settings */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Notifications Push</h3>
+          <div className="space-y-3 md:space-y-4">
+            <h3 className="font-semibold text-sm md:text-base">Notifications Push</h3>
             
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="pushEnabled">Activer les notifications push</Label>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <Label htmlFor="pushEnabled" className="text-sm md:text-base">Activer les notifications push</Label>
                 <p className="text-xs text-gray-500">Recevoir des notifications dans le navigateur</p>
               </div>
               <input
@@ -431,54 +433,54 @@ export function NotificationSettings() {
                 id="pushEnabled"
                 checked={preferences?.pushEnabled || false}
                 onChange={(e) => handleToggle('pushEnabled', e.target.checked)}
-                className="w-5 h-5"
+                className="w-5 h-5 cursor-pointer flex-shrink-0"
                 disabled={!pushSubscribed}
               />
             </div>
 
             {preferences?.pushEnabled && pushSubscribed && (
               <div className="ml-6 space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="pushNewMessages">Nouveaux messages</Label>
+                <div className="flex items-center justify-between gap-4">
+                  <Label htmlFor="pushNewMessages" className="text-sm">Nouveaux messages</Label>
                   <input
                     type="checkbox"
                     id="pushNewMessages"
                     checked={preferences?.pushNewMessages || false}
                     onChange={(e) => handleToggle('pushNewMessages', e.target.checked)}
-                    className="w-5 h-5"
+                    className="w-5 h-5 cursor-pointer flex-shrink-0"
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="pushNewListings">Nouvelles annonces</Label>
+                <div className="flex items-center justify-between gap-4">
+                  <Label htmlFor="pushNewListings" className="text-sm">Nouvelles annonces</Label>
                   <input
                     type="checkbox"
                     id="pushNewListings"
                     checked={preferences?.pushNewListings || false}
                     onChange={(e) => handleToggle('pushNewListings', e.target.checked)}
-                    className="w-5 h-5"
+                    className="w-5 h-5 cursor-pointer flex-shrink-0"
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="pushNewReviews">Nouvelles évaluations</Label>
+                <div className="flex items-center justify-between gap-4">
+                  <Label htmlFor="pushNewReviews" className="text-sm">Nouvelles évaluations</Label>
                   <input
                     type="checkbox"
                     id="pushNewReviews"
                     checked={preferences?.pushNewReviews || false}
                     onChange={(e) => handleToggle('pushNewReviews', e.target.checked)}
-                    className="w-5 h-5"
+                    className="w-5 h-5 cursor-pointer flex-shrink-0"
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="pushPaymentUpdates">Mises à jour de paiement</Label>
+                <div className="flex items-center justify-between gap-4">
+                  <Label htmlFor="pushPaymentUpdates" className="text-sm">Mises à jour de paiement</Label>
                   <input
                     type="checkbox"
                     id="pushPaymentUpdates"
                     checked={preferences?.pushPaymentUpdates || false}
                     onChange={(e) => handleToggle('pushPaymentUpdates', e.target.checked)}
-                    className="w-5 h-5"
+                    className="w-5 h-5 cursor-pointer flex-shrink-0"
                   />
                 </div>
               </div>

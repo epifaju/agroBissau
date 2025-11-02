@@ -193,16 +193,16 @@ export function ChatWindow({
   const otherUserInitials = `${otherUser.firstName[0]}${otherUser.lastName[0]}`;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full max-h-[calc(100vh-200px)] md:max-h-none">
       {/* Header */}
-      <div className="border-b p-4 bg-white">
-        <div className="flex items-center gap-3">
-          <Avatar>
+      <div className="border-b p-3 md:p-4 bg-white">
+        <div className="flex items-center gap-2 md:gap-3">
+          <Avatar className="h-8 w-8 md:h-10 md:w-10">
             <AvatarImage src={otherUser.avatar} />
-            <AvatarFallback>{otherUserInitials}</AvatarFallback>
+            <AvatarFallback className="text-xs md:text-sm">{otherUserInitials}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <p className="font-semibold">
+            <p className="font-semibold text-sm md:text-base">
               {otherUser.firstName} {otherUser.lastName}
             </p>
             {isConnected ? (
@@ -215,7 +215,7 @@ export function ChatWindow({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4 bg-gray-50">
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 py-8">
             <p>{t('noMessages')}</p>
@@ -230,23 +230,23 @@ export function ChatWindow({
             return (
               <div
                 key={message.id}
-                className={`flex gap-3 ${isOwn ? 'flex-row-reverse' : ''}`}
+                className={`flex gap-2 md:gap-3 ${isOwn ? 'flex-row-reverse' : ''}`}
               >
-                <Avatar className="h-8 w-8 flex-shrink-0">
+                <Avatar className="h-7 w-7 md:h-8 md:w-8 flex-shrink-0">
                   <AvatarImage
                     src={isOwn ? message.sender.avatar : message.receiver.avatar}
                   />
-                  <AvatarFallback>{senderInitials}</AvatarFallback>
+                  <AvatarFallback className="text-xs md:text-sm">{senderInitials}</AvatarFallback>
                 </Avatar>
                 <div className={`flex-1 ${isOwn ? 'text-right' : ''}`}>
                   <div
-                    className={`inline-block max-w-[70%] rounded-lg p-3 ${
+                    className={`inline-block max-w-[75%] md:max-w-[70%] rounded-lg p-2 md:p-3 ${
                       isOwn
                         ? 'bg-green-600 text-white'
                         : 'bg-white border border-gray-200'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-xs md:text-sm whitespace-pre-wrap break-words">{message.content}</p>
                   </div>
                   <p className="text-xs text-gray-500 mt-1 px-1">
                     {formatRelativeTime(message.createdAt)}
@@ -257,11 +257,11 @@ export function ChatWindow({
           })
         )}
         {otherUserTyping && (
-          <div className="flex gap-3">
-            <Avatar className="h-8 w-8 flex-shrink-0">
-              <AvatarFallback>{otherUserInitials}</AvatarFallback>
+          <div className="flex gap-2 md:gap-3">
+            <Avatar className="h-7 w-7 md:h-8 md:w-8 flex-shrink-0">
+              <AvatarFallback className="text-xs md:text-sm">{otherUserInitials}</AvatarFallback>
             </Avatar>
-            <div className="bg-white border border-gray-200 rounded-lg p-3">
+            <div className="bg-white border border-gray-200 rounded-lg p-2 md:p-3">
               <div className="flex gap-1">
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
@@ -274,26 +274,26 @@ export function ChatWindow({
       </div>
 
       {/* Input */}
-      <div className="border-t p-4 bg-white">
+      <div className="border-t p-3 md:p-4 bg-white">
         <div className="flex gap-2">
           <Textarea
             value={input}
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={t('typeMessage')}
-            className="min-h-[60px] max-h-[120px] resize-none"
+            className="min-h-[50px] md:min-h-[60px] max-h-[120px] resize-none text-sm md:text-base"
             disabled={!isConnected || sending}
           />
           <Button
             onClick={handleSend}
             disabled={!input.trim() || !isConnected || sending}
             size="icon"
-            className="flex-shrink-0"
+            className="flex-shrink-0 touch-target"
           >
             {sending ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
             ) : (
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4 md:w-5 md:h-5" />
             )}
           </Button>
         </div>

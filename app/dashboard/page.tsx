@@ -53,6 +53,7 @@ export default function DashboardPage() {
     if (isAuthenticated) {
       fetchDashboardStats();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   const fetchDashboardStats = async () => {
@@ -93,22 +94,9 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="border-b bg-white">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-green-600">
-            🌾 AgroBissau
-          </Link>
-          <nav className="flex gap-4 items-center">
-            <Link href="/listings">{tNav('listings')}</Link>
-            <span className="text-gray-600">{user?.name || user?.email}</span>
-          </nav>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">{t('title')}</h1>
+      <div className="p-4 md:p-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold">{t('title')}</h1>
           <Link 
             href="/dashboard/analytics"
             className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
@@ -118,7 +106,7 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">{t('overview.myListings')}</CardTitle>
@@ -232,31 +220,31 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="flex gap-4 flex-wrap">
-          <Link href="/listings/create">
-            <Button size="lg">{t('actions.createListing')}</Button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+          <Link href="/listings/create" className="col-span-1">
+            <Button size="lg" className="w-full">{t('actions.createListing')}</Button>
           </Link>
           <Link 
             href="/dashboard/alerts"
-            className="inline-flex items-center justify-center h-11 rounded-md px-6 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
+            className="inline-flex items-center justify-center h-11 rounded-md px-4 md:px-6 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
           >
-            🔔 {t('actions.viewAlerts')}
+            🔔 <span className="ml-2">{t('actions.viewAlerts')}</span>
           </Link>
           <Link 
             href="/dashboard/favorites"
-            className="inline-flex items-center justify-center h-11 rounded-md px-6 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
+            className="inline-flex items-center justify-center h-11 rounded-md px-4 md:px-6 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
           >
-            ❤️ {t('actions.viewFavorites')}
+            ❤️ <span className="ml-2">{t('actions.viewFavorites')}</span>
           </Link>
           <Link 
             href="/dashboard/export"
-            className="inline-flex items-center justify-center h-11 rounded-md px-6 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
+            className="inline-flex items-center justify-center h-11 rounded-md px-4 md:px-6 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
           >
-            📥 {t('actions.exportData')}
+            📥 <span className="ml-2">{t('actions.exportData')}</span>
           </Link>
           {(user as any)?.role === 'ADMIN' && (
-            <Link href="/admin">
-              <Button size="lg" variant="destructive">
+            <Link href="/admin" className="col-span-1 sm:col-span-2 lg:col-span-1">
+              <Button size="lg" variant="destructive" className="w-full">
                 {t('actions.accessAdmin')}
               </Button>
             </Link>

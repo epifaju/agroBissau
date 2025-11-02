@@ -32,11 +32,27 @@ export async function GET(
       );
     }
 
-    // Increment view count
-    await prisma.listing.update({
-      where: { id: params.id },
-      data: { viewCount: { increment: 1 } },
-    });
+    // Increment view count (only if listing is active)
+    if (listing.status === 'ACTIVE') {
+      await prisma.listing.update({
+        where: { id: params.id },
+        data: { viewCount: { increment: 1 } },
+      });
+
+      // Check and award badges for the listing owner (async, don't block response)
+      try {
+        const { checkAndAwardBadges } = await import('@/lib/badges');
+        checkAndAwardBadges({ 
+          type: 'listing_viewed', 
+          userId: listing.userId, 
+          listingId: listing.id 
+        }).catch((err) => {
+          console.error('Error awarding badges:', err);
+        });
+      } catch (badgeError) {
+        console.error('Badge check error:', badgeError);
+      }
+    }
 
     return NextResponse.json(listing);
   } catch (error) {
@@ -90,6 +106,8 @@ export async function PUT(
         quantity: typeof body.quantity === 'number' ? body.quantity : parseInt(body.quantity),
         availableFrom: body.availableFrom ? new Date(body.availableFrom) : undefined,
         expiresAt: body.expiresAt ? new Date(body.expiresAt) : undefined,
+        originalPrice: body.originalPrice ? (typeof body.originalPrice === 'number' ? body.originalPrice : parseFloat(body.originalPrice)) : undefined,
+        promotionUntil: body.promotionUntil ? new Date(body.promotionUntil) : undefined,
       });
 
       const updatedListing = await prisma.listing.update({

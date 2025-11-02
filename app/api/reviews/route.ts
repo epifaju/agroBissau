@@ -135,6 +135,18 @@ export async function POST(req: Request) {
       relatedType: 'review',
     });
 
+    // Check and award badges if 5-star review (async, don't block response)
+    if (validated.rating === 5) {
+      try {
+        const { checkAndAwardBadges } = await import('@/lib/badges');
+        checkAndAwardBadges({ type: 'review_received', userId: validated.reviewedId, rating: 5 }).catch((err) => {
+          console.error('Error awarding badges:', err);
+        });
+      } catch (badgeError) {
+        console.error('Badge check error:', badgeError);
+      }
+    }
+
     return NextResponse.json(review, { status: 201 });
   } catch (error: any) {
     if (error.errors) {

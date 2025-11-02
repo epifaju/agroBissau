@@ -12,7 +12,7 @@ interface CreateNotificationOptions {
   userId: string;
   title: string;
   message: string;
-  type: 'MESSAGE' | 'LISTING' | 'REVIEW' | 'PAYMENT' | 'SYSTEM';
+  type: 'MESSAGE' | 'LISTING' | 'REVIEW' | 'PAYMENT' | 'SYSTEM' | 'QUESTION_RECEIVED' | 'ANSWER_RECEIVED';
   relatedId?: string;
   relatedType?: string;
   sendPush?: boolean;
@@ -121,6 +121,9 @@ function getNotificationUrl(type: string, relatedId?: string | null): string {
       return `${process.env.NEXTAUTH_URL}/profile/${relatedId}?tab=reviews`;
     case 'PAYMENT':
       return `${process.env.NEXTAUTH_URL}/dashboard/payments`;
+    case 'QUESTION_RECEIVED':
+    case 'ANSWER_RECEIVED':
+      return `${process.env.NEXTAUTH_URL}/listings/${relatedId}`;
     default:
       return `${process.env.NEXTAUTH_URL}/dashboard`;
   }

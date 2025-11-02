@@ -1,9 +1,13 @@
-import Link from 'next/link';
+'use client';
+
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatPrice, formatRelativeTime } from '@/lib/utils';
+import { FavoriteButton } from './FavoriteButton';
+import { DiscountBadge } from './DiscountBadge';
+import { isPromotionActive, getEffectivePrice } from '@/lib/promotions';
 
 interface ListingCardProps {
   listing: {
@@ -21,16 +25,29 @@ interface ListingCardProps {
       avatar?: string;
     };
     isFeatured?: boolean;
+    originalPrice?: number | string | null;
+    discountPercent?: number | null;
+    promotionUntil?: string | Date | null;
   };
 }
 
 export function ListingCard({ listing }: ListingCardProps) {
   const locationText = listing.location?.city || listing.location?.address || 'Localisation non spécifiée';
   const userInitials = `${listing.user.firstName[0]}${listing.user.lastName[0]}`;
+  
+  const isPromotion = isPromotionActive(listing);
+  const priceInfo = getEffectivePrice(listing);
+
+  const handleCardClick = () => {
+    window.location.href = `/listings/${listing.id}`;
+  };
 
   return (
-    <Link href={`/listings/${listing.id}`}>
-      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+    <Card 
+      className="hover:shadow-lg transition-shadow cursor-pointer h-full group relative"
+      onClick={handleCardClick}
+    >
+      <div className="relative">
         <div className="relative">
           {listing.images && listing.images.length > 0 ? (
               <Image
@@ -47,48 +64,66 @@ export function ListingCard({ listing }: ListingCardProps) {
             </div>
           )}
           {listing.isFeatured && (
-            <Badge className="absolute top-2 right-2">Featured</Badge>
+            <Badge className="absolute top-2 left-2 z-10">Featured</Badge>
+          )}
+          {isPromotion && priceInfo.percent > 0 && (
+            <DiscountBadge discountPercent={priceInfo.percent} size="sm" className="absolute top-2 left-2 z-10" />
           )}
         </div>
         <CardContent className="p-4">
           <h3 className="font-semibold text-lg mb-2 line-clamp-2">{listing.title}</h3>
-          <p className="text-green-600 font-bold text-xl mb-2">
-            {formatPrice(listing.price)} / {listing.unit}
-          </p>
+          <div className="mb-2">
+            {isPromotion && priceInfo.original > priceInfo.discounted ? (
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <p className="text-green-600 font-bold text-xl">
+                    {formatPrice(priceInfo.discounted)} / {listing.unit}
+                  </p>
+                  <DiscountBadge discountPercent={priceInfo.percent} size="sm" />
+                </div>
+                <p className="text-gray-400 line-through text-sm">
+                  {formatPrice(priceInfo.original)} / {listing.unit}
+                </p>
+              </div>
+            ) : (
+              <p className="text-green-600 font-bold text-xl">
+                {formatPrice(listing.price)} / {listing.unit}
+              </p>
+            )}
+          </div>
           <p className="text-gray-600 text-sm mb-3">{locationText}</p>
           <div className="flex items-center justify-between">
-            {listing.user.id ? (
-              <Link
-                href={`/profile/${listing.user.id}`}
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-2 hover:text-green-600 transition-colors"
-              >
+            <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={listing.user.avatar} />
                 <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
-              <span className="text-sm text-gray-600">
-                {listing.user.firstName} {listing.user.lastName}
-              </span>
-            </Link>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={listing.user.avatar} />
-                  <AvatarFallback>{userInitials}</AvatarFallback>
-                </Avatar>
+              {listing.user.id ? (
+                <span
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = `/profile/${listing.user.id}`;
+                  }}
+                  className="text-sm text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
+                >
+                  {listing.user.firstName} {listing.user.lastName}
+                </span>
+              ) : (
                 <span className="text-sm text-gray-600">
                   {listing.user.firstName} {listing.user.lastName}
                 </span>
-              </div>
-            )}
+              )}
+            </div>
             <span className="text-xs text-gray-400">
               {formatRelativeTime(listing.createdAt)}
             </span>
           </div>
         </CardContent>
-      </Card>
-    </Link>
+        {/* FavoriteButton en dehors du Link pour éviter les problèmes d'hydratation */}
+        <FavoriteButton listingId={listing.id} variant="icon" />
+      </div>
+    </Card>
   );
 }
 

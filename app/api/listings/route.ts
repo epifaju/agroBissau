@@ -218,6 +218,11 @@ export async function POST(req: Request) {
       );
     }
 
+    // Calculer discountPercent si promotion
+    const discountPercent = validated.originalPrice && validated.originalPrice > validated.price
+      ? Math.round(((validated.originalPrice - validated.price) / validated.originalPrice) * 100)
+      : null;
+
     const listing = await prisma.listing.create({
       data: {
         ...validated,
@@ -225,12 +230,46 @@ export async function POST(req: Request) {
         userId,
         images: validated.images,
         location: validated.location,
+        originalPrice: validated.originalPrice || null,
+        discountPercent: discountPercent,
+        promotionUntil: validated.promotionUntil || null,
       },
       include: {
         user: true,
         category: true,
       },
     });
+
+    // Track analytics event
+    try {
+      await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/analytics/track`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event: 'listing_created',
+          properties: {
+            listingId: listing.id,
+            categoryId: listing.categoryId,
+            type: listing.type,
+            price: Number(listing.price),
+          },
+          userId,
+        }),
+      });
+    } catch (analyticsError) {
+      // Don't fail the request if analytics fails
+      console.error('Analytics tracking error:', analyticsError);
+    }
+
+    // Check and award badges (async, don't block response)
+    try {
+      const { checkAndAwardBadges } = await import('@/lib/badges');
+      checkAndAwardBadges({ type: 'listing_created', userId }).catch((err) => {
+        console.error('Error awarding badges:', err);
+      });
+    } catch (badgeError) {
+      console.error('Badge check error:', badgeError);
+    }
 
     return NextResponse.json(listing, { status: 201 });
   } catch (error: any) {

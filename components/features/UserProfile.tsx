@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ListingCard } from '@/components/features/ListingCard';
+import { UserBadges } from './UserBadges';
+import { ReportButton } from './ReportButton';
 import { formatDate } from '@/lib/utils';
 
 interface UserProfileProps {
@@ -152,12 +154,18 @@ export function UserProfile({
                   )}
                 </div>
 
-                {/* Bouton de contact */}
+                {/* Boutons d'action */}
                 {showContactButton && currentUserId !== user.id && (
-                  <Button onClick={handleContact} disabled={contacting}>
-                    <MessageSquare className="w-4 h-4 mr-2" />
-                    {contacting ? 'Connexion...' : 'Contacter'}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button onClick={handleContact} disabled={contacting}>
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      {contacting ? 'Connexion...' : 'Contacter'}
+                    </Button>
+                    <ReportButton
+                      reportedUserId={user.id}
+                      variant="button"
+                    />
+                  </div>
                 )}
               </div>
             </div>
@@ -229,6 +237,9 @@ export function UserProfile({
           </div>
         </div>
       )}
+
+      {/* Badges */}
+      <UserBadges userId={user.id} />
 
       {/* Évaluations */}
       <div>

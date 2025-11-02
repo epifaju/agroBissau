@@ -278,3 +278,71 @@ export async function sendReviewNotificationEmail(
   });
 }
 
+export async function sendSearchAlertEmail(
+  userEmail: string,
+  userName: string,
+  alertTitle: string,
+  listings: Array<{
+    id: string;
+    title: string;
+    price: number;
+    unit: string;
+    location: any;
+  }>,
+  searchUrl: string
+) {
+  const listingsHtml = listings
+    .slice(0, 5)
+    .map(
+      (listing) => `
+      <div style="background: white; padding: 15px; border-left: 4px solid #10b981; margin: 15px 0;">
+        <h3 style="margin: 0 0 10px 0;">${listing.title}</h3>
+        <p style="margin: 5px 0; color: #10b981; font-weight: bold;">${Number(listing.price).toLocaleString('fr-FR')} FCFA / ${listing.unit}</p>
+        <p style="margin: 5px 0; color: #666; font-size: 14px;">📍 ${listing.location?.city || listing.location?.address || 'Localisation non spécifiée'}</p>
+        <a href="${process.env.NEXTAUTH_URL}/listings/${listing.id}" style="color: #10b981; text-decoration: none; font-size: 14px;">Voir l'annonce →</a>
+      </div>
+    `
+    )
+    .join('');
+
+  return sendEmail({
+    to: userEmail,
+    subject: `Nouvelles annonces correspondant à "${alertTitle}" - AgroBissau`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #10b981; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background: #f9fafb; }
+          .button { display: inline-block; padding: 12px 24px; background: #10b981; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔔 Nouvelles annonces trouvées</h1>
+          </div>
+          <div class="content">
+            <p>Bonjour ${userName},</p>
+            <p>Nous avons trouvé <strong>${listings.length}</strong> ${listings.length > 1 ? 'nouvelles annonces' : 'nouvelle annonce'} correspondant à votre alerte "<strong>${alertTitle}</strong>" :</p>
+            ${listingsHtml}
+            ${listings.length > 5 ? `<p style="text-align: center; margin-top: 20px;">Et ${listings.length - 5} autre${listings.length - 5 > 1 ? 's' : ''} annonce${listings.length - 5 > 1 ? 's' : ''}...</p>` : ''}
+            <div style="text-align: center; margin-top: 30px;">
+              <a href="${searchUrl}" class="button">Voir toutes les annonces</a>
+            </div>
+            <p style="margin-top: 30px; font-size: 12px; color: #666;">
+              Vous recevez cet email car vous avez créé une alerte de recherche. 
+              <a href="${process.env.NEXTAUTH_URL}/dashboard/alerts" style="color: #10b981;">Gérer mes alertes</a>
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}
+

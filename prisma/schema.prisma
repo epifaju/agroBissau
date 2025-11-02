@@ -8,31 +8,38 @@ datasource db {
 }
 
 model User {
-  id                String      @id @default(cuid())
-  email             String      @unique
-  password          String?     // Nullable for OAuth users
-  phone             String?     @unique
+  id                String   @id @default(cuid())
+  email             String   @unique
+  password          String? // Nullable for OAuth users
+  phone             String?  @unique
   firstName         String
   lastName          String
   avatar            String?
-  role              UserRole    @default(MEMBER)
-  subscriptionTier  SubTier     @default(FREE)
-  verificationLevel Int         @default(0)
-  isActive          Boolean     @default(true)
+  role              UserRole @default(MEMBER)
+  subscriptionTier  SubTier  @default(FREE)
+  verificationLevel Int      @default(0)
+  isActive          Boolean  @default(true)
   location          Json?
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
-  
-  listings          Listing[]
-  messages          Message[]   @relation("SentMessages")
-  receivedMessages  Message[]   @relation("ReceivedMessages")
-  reviews           Review[]    @relation("ReviewsGiven")
-  reviewsReceived   Review[]    @relation("ReviewsReceived")
-  transactions      Transaction[]
-  subscription      Subscription?
-  pushSubscriptions PushSubscription[]
-  notifications     Notification[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  listings                Listing[]
+  messages                Message[]                @relation("SentMessages")
+  receivedMessages        Message[]                @relation("ReceivedMessages")
+  reviews                 Review[]                 @relation("ReviewsGiven")
+  reviewsReceived         Review[]                 @relation("ReviewsReceived")
+  transactions            Transaction[]
+  subscription            Subscription?
+  pushSubscriptions       PushSubscription[]
+  notifications           Notification[]
   notificationPreferences NotificationPreferences?
+  searchAlerts            SearchAlert[]
+  favorites               Favorite[]
+  badges                  UserBadge[]
+  reportsMade             Report[]                 @relation("ReportsMade")
+  reportsReceived         Report[]                 @relation("ReportsReceived")
+  questionsAsked          Question[]               @relation("QuestionsAsked")
+  answersGiven            Answer[]                 @relation("AnswersGiven")
 
   @@map("users")
 }
@@ -57,96 +64,102 @@ model Listing {
   featuredUntil   DateTime?
   viewCount       Int           @default(0)
   contactCount    Int           @default(0)
-  
-  user            User          @relation(fields: [userId], references: [id])
-  userId          String
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  
-  transactions    Transaction[]
-  reviews         Review[]
+  originalPrice   Decimal? // Prix original si en promotion
+  discountPercent Int? // Pourcentage de réduction (0-100)
+  promotionUntil  DateTime? // Date de fin de promotion
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions Transaction[]
+  reviews      Review[]
+  favoritedBy  Favorite[]
+  reports      Report[]
+  questions    Question[]
 
   @@map("listings")
 }
 
 model Category {
-  id          String    @id @default(cuid())
-  name        String    @unique
+  id             String  @id @default(cuid())
+  name           String  @unique
   namePortuguese String?
-  icon        String?
-  description String?
-  isActive    Boolean   @default(true)
-  order       Int       @default(0)
-  
-  listings    Listing[]
-  
+  icon           String?
+  description    String?
+  isActive       Boolean @default(true)
+  order          Int     @default(0)
+
+  listings Listing[]
+
   @@map("categories")
 }
 
 model Message {
-  id         String      @id @default(cuid())
+  id         String   @id @default(cuid())
   content    String
-  isRead     Boolean     @default(false)
-  sender     User        @relation("SentMessages", fields: [senderId], references: [id])
+  isRead     Boolean  @default(false)
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
   senderId   String
-  receiver   User        @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
   receiverId String
   listingId  String?
-  createdAt  DateTime    @default(now())
-  
+  createdAt  DateTime @default(now())
+
   @@map("messages")
 }
 
 model Transaction {
-  id              String            @id @default(cuid())
-  amount          Decimal
-  paymentMethod   PaymentMethod
-  status          TransactionStatus @default(PENDING)
-  buyer           User              @relation(fields: [buyerId], references: [id])
-  buyerId         String
-  listing         Listing           @relation(fields: [listingId], references: [id])
-  listingId       String
+  id               String            @id @default(cuid())
+  amount           Decimal
+  paymentMethod    PaymentMethod
+  status           TransactionStatus @default(PENDING)
+  buyer            User              @relation(fields: [buyerId], references: [id])
+  buyerId          String
+  listing          Listing           @relation(fields: [listingId], references: [id])
+  listingId        String
   paymentReference String?
-  
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("transactions")
 }
 
 model Review {
-  id          String   @id @default(cuid())
-  rating      Int
-  comment     String?
-  response    String?
-  reviewer    User     @relation("ReviewsGiven", fields: [reviewerId], references: [id])
-  reviewerId  String
-  reviewed    User     @relation("ReviewsReceived", fields: [reviewedId], references: [id])
-  reviewedId  String
-  listing     Listing  @relation(fields: [listingId], references: [id])
-  listingId   String
-  
-  createdAt   DateTime @default(now())
-  
+  id         String  @id @default(cuid())
+  rating     Int
+  comment    String?
+  response   String?
+  reviewer   User    @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  reviewerId String
+  reviewed   User    @relation("ReviewsReceived", fields: [reviewedId], references: [id])
+  reviewedId String
+  listing    Listing @relation(fields: [listingId], references: [id])
+  listingId  String
+
+  createdAt DateTime @default(now())
+
   @@unique([reviewerId, listingId])
   @@map("reviews")
 }
 
 model Subscription {
-  id              String    @id @default(cuid())
-  tier            SubTier
-  startDate       DateTime  @default(now())
-  endDate         DateTime
-  isActive        Boolean   @default(true)
+  id               String   @id @default(cuid())
+  tier             SubTier
+  startDate        DateTime @default(now())
+  endDate          DateTime
+  isActive         Boolean  @default(true)
   paymentReference String?
-  
-  user            User      @relation(fields: [userId], references: [id])
-  userId          String    @unique
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("subscriptions")
 }
 
@@ -197,11 +210,13 @@ enum NotificationType {
   REVIEW
   PAYMENT
   SYSTEM
+  QUESTION_RECEIVED
+  ANSWER_RECEIVED
 }
 
 model PushSubscription {
   id        String   @id @default(cuid())
-  endpoint String   @unique
+  endpoint  String   @unique
   p256dh    String
   auth      String
   userId    String
@@ -209,6 +224,7 @@ model PushSubscription {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@map("push_subscriptions")
 }
 
@@ -220,9 +236,10 @@ model Notification {
   isRead      Boolean          @default(false)
   userId      String
   user        User             @relation(fields: [userId], references: [id])
-  relatedId  String?
+  relatedId   String?
   relatedType String?
   createdAt   DateTime         @default(now())
+
   @@map("notifications")
 }
 
@@ -241,6 +258,136 @@ model NotificationPreferences {
   pushNewReviews      Boolean  @default(true)
   pushPaymentUpdates  Boolean  @default(true)
   updatedAt           DateTime @updatedAt
+
   @@map("notification_preferences")
 }
 
+model SearchAlert {
+  id             String    @id @default(cuid())
+  title          String
+  criteria       Json // { categoryId, minPrice, maxPrice, location, keywords, type }
+  isActive       Boolean   @default(true)
+  frequency      String    @default("daily") // daily, weekly, instant
+  lastNotifiedAt DateTime?
+  user           User      @relation(fields: [userId], references: [id])
+  userId         String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([isActive])
+  @@map("search_alerts")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingId String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@index([userId])
+  @@index([listingId])
+  @@map("favorites")
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String
+  nameKey     String   @unique // Pour référence (ex: "first_listing")
+  description String
+  icon        String // Emoji ou URL icône
+  category    String // "achievement", "milestone", etc.
+  criteria    Json // { type: "listing_count", value: 10 }
+  createdAt   DateTime @default(now())
+
+  userBadges UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+  badge    Badge    @relation(fields: [badgeId], references: [id])
+  badgeId  String
+  earnedAt DateTime @default(now())
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@map("user_badges")
+}
+
+model Report {
+  id                String       @id @default(cuid())
+  type              ReportType
+  reason            String?
+  description       String
+  status            ReportStatus @default(PENDING)
+  reporter          User         @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
+  reporterId        String
+  reportedUser      User?        @relation("ReportsReceived", fields: [reportedUserId], references: [id], onDelete: Cascade)
+  reportedUserId    String?
+  reportedListing   Listing?     @relation(fields: [reportedListingId], references: [id], onDelete: Cascade)
+  reportedListingId String?
+  adminNote         String?
+  resolvedBy        String?
+  resolvedAt        DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([status])
+  @@index([reporterId])
+  @@index([reportedUserId])
+  @@index([reportedListingId])
+  @@index([createdAt])
+  @@map("reports")
+}
+
+enum ReportType {
+  SPAM
+  INAPPROPRIATE
+  FAKE
+  COPYRIGHT
+  SCAM
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+model Question {
+  id        String   @id @default(cuid())
+  content   String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingId String
+  asker     User     @relation("QuestionsAsked", fields: [askerId], references: [id], onDelete: Cascade)
+  askerId   String
+  answer    Answer?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([listingId])
+  @@index([askerId])
+  @@map("questions")
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  content    String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String   @unique
+  answerer   User     @relation("AnswersGiven", fields: [answererId], references: [id], onDelete: Cascade)
+  answererId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("answers")
+}

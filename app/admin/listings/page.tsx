@@ -60,8 +60,13 @@ export default function AdminListingsPage() {
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
   const [updating, setUpdating] = useState<string | null>(null);
 
+  // Charger les catégories une seule fois au montage
   useEffect(() => {
     fetchCategories();
+  }, []);
+
+  // Charger les listings quand les filtres changent
+  useEffect(() => {
     fetchListings();
   }, [page, search, statusFilter, categoryFilter, needsModeration]);
 
@@ -70,7 +75,13 @@ export default function AdminListingsPage() {
       const response = await fetch('/api/categories');
       if (response.ok) {
         const data = await response.json();
-        setCategories(data.categories || []);
+        // L'API retourne directement un tableau, pas un objet avec une propriété categories
+        const categoriesList = Array.isArray(data) ? data : (data.categories || []);
+        console.log('Categories loaded:', categoriesList.length);
+        setCategories(categoriesList);
+      } else {
+        const errorText = await response.text();
+        console.error('Error fetching categories: Response not OK', response.status, errorText);
       }
     } catch (error) {
       console.error('Error fetching categories:', error);

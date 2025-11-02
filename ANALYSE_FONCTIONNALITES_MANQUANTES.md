@@ -8,6 +8,7 @@
 ## ✅ FONCTIONNALITÉS DÉJÀ IMPLÉMENTÉES
 
 ### 🔐 Authentification & Utilisateurs
+
 - ✅ Authentification NextAuth.js (credentials + Google OAuth)
 - ✅ Pages login/register
 - ✅ Sessions JWT
@@ -16,6 +17,7 @@
 - ✅ Dashboard utilisateur (`/dashboard`)
 
 ### 📝 Annonces (Listings)
+
 - ✅ CRUD complet des annonces
 - ✅ Upload d'images Cloudinary (multiple)
 - ✅ Formulaire de création/édition avec géolocalisation
@@ -25,24 +27,28 @@
 - ✅ Catégories avec support multilingue
 
 ### 💬 Chat & Communication
+
 - ✅ Chat temps réel avec Socket.io
 - ✅ Interface de chat complète (`ChatWindow`, `ChatList`)
 - ✅ Messages persistants en base de données
 - ✅ Page messages (`/dashboard/messages`)
 
 ### ⭐ Évaluations
+
 - ✅ Système d'évaluations (ratings + commentaires)
 - ✅ API routes complètes (`/api/reviews`)
 - ✅ Composants `ReviewCard`, `ReviewForm`, `ReviewsList`
 - ✅ Affichage dans les profils
 
 ### 💎 Abonnements Premium
+
 - ✅ Système d'abonnements (FREE, PREMIUM_BASIC, PREMIUM_PRO, ENTERPRISE)
 - ✅ Limites par niveau d'abonnement
 - ✅ Page subscription (`/dashboard/subscription`)
 - ✅ Composants `SubscriptionPlans`, `SubscriptionCard`
 
 ### 💳 Paiements
+
 - ✅ Intégration Wave Money (structure)
 - ✅ Intégration Orange Money (structure)
 - ✅ Callbacks de paiement
@@ -50,6 +56,7 @@
 - ✅ Composant `PaymentForm`
 
 ### 🔔 Notifications
+
 - ✅ Notifications push (web-push)
 - ✅ Notifications email (nodemailer)
 - ✅ Préférences utilisateur configurables
@@ -57,11 +64,13 @@
 - ✅ Intégration dans les événements (messages, reviews, etc.)
 
 ### 🗺️ Géolocalisation
+
 - ✅ Composant `LocationPicker` (Leaflet)
 - ✅ Affichage carte dans les annonces (`ListingMap`)
 - ✅ Sauvegarde coordonnées (lat/lng)
 
 ### 📱 PWA
+
 - ✅ Configuration PWA (next-pwa)
 - ✅ Manifest.json
 - ✅ Service Worker
@@ -74,11 +83,14 @@
 ### 🔴 PRIORITÉ HAUTE - Features Core
 
 #### 1. **Back-office Administrateur** 👨‍💼
+
 **Statut** : ❌ Absent  
 **Impact** : Critique pour la modération et la gestion de la plateforme
 
 **Manquant :**
+
 - [ ] Pages admin (`/admin/*`)
+
   - [ ] `/admin` - Dashboard admin avec statistiques
   - [ ] `/admin/users` - Gestion des utilisateurs
   - [ ] `/admin/listings` - Modération des annonces
@@ -97,24 +109,30 @@
 ---
 
 #### 2. **Annonces Featured & Similaires** 🔝
+
 **Statut** : ⚠️ Partiellement implémenté  
 **Impact** : Important pour la découverte et la visibilité
 
 **Manquant :**
+
 - [ ] API route `/api/listings/[id]/similar`
+
   - GET : Trouver des annonces similaires (même catégorie, prix proche, même ville)
   - Limiter à 5-6 résultats
 
 - [ ] API route `/api/listings/[id]/feature`
+
   - POST : Marquer une annonce comme featured
   - Vérifier les limites selon l'abonnement
   - Définir `featuredUntil` (date d'expiration)
 
 - [ ] Affichage annonces similaires
+
   - Section dans la page détail d'annonce (`/listings/[id]`)
   - Utiliser `ListingCard`
 
 - [ ] Affichage annonces featured
+
   - Section sur la homepage (`/`)
   - Badge "Featured" (déjà présent dans `ListingCard`)
   - Filtrer par `isFeatured: true` et `featuredUntil > now()`
@@ -128,11 +146,14 @@
 ---
 
 #### 3. **Contact Vendeur depuis Annonce** 📧
+
 **Statut** : ❌ Absent  
 **Impact** : Important pour l'engagement utilisateur
 
 **Manquant :**
+
 - [ ] API route `/api/listings/[id]/contact`
+
   - POST : Envoyer un message au vendeur
   - Créer une conversation si elle n'existe pas
   - Incrémenter `contactCount` de l'annonce
@@ -148,20 +169,25 @@
 ---
 
 #### 4. **Dashboard Analytics Utilisateur** 📊
+
 **Statut** : ❌ Absent  
 **Impact** : Moyen - améliore l'expérience utilisateur
 
 **Manquant :**
+
 - [ ] API route `/api/users/me/dashboard`
+
   - Statistiques : nombre d'annonces, vues, contacts
   - Évolution dans le temps
   - Annonces les plus populaires
 
 - [ ] API route `/api/users/me/analytics`
+
   - Métriques détaillées
   - Graphiques de données (recharts ou chart.js)
 
 - [ ] Page `/dashboard/analytics`
+
   - Graphiques visuels
   - Statistiques détaillées
   - Export des données (optionnel)
@@ -178,11 +204,14 @@
 ### 🟡 PRIORITÉ MOYENNE - Features Avancées
 
 #### 5. **SearchAlerts / Alertes de Recherche** 🔔
+
 **Statut** : ❌ Absent du schema Prisma  
 **Impact** : Moyen - améliore l'engagement
 
 **Manquant :**
+
 - [ ] Ajouter le modèle `SearchAlert` au schema Prisma
+
   ```prisma
   model SearchAlert {
     id          String  @id @default(cuid())
@@ -199,12 +228,14 @@
   ```
 
 - [ ] API routes `/api/alerts/*`
+
   - POST : Créer une alerte
   - GET : Liste des alertes de l'utilisateur
   - PUT : Modifier une alerte
   - DELETE : Supprimer une alerte
 
 - [ ] Page `/dashboard/alerts` ou section dans settings
+
   - Interface pour créer/gérer les alertes
   - Formulaire de critères de recherche
 
@@ -215,16 +246,20 @@
 ---
 
 #### 6. **Homepage Enrichie** 🏠
+
 **Statut** : ⚠️ Basique actuellement  
 **Impact** : Moyen - amélioration UX
 
 **Manquant :**
+
 - [ ] Afficher les annonces featured sur la homepage
+
   - Section "Annonces en vedette"
   - Grid avec `ListingCard`
   - Lien "Voir toutes les annonces"
 
 - [ ] Afficher les dernières annonces
+
   - Section "Dernières annonces"
   - Pagination ou "Voir plus"
 
@@ -236,10 +271,12 @@
 ---
 
 #### 7. **Export de Données** 📥
+
 **Statut** : ❌ Absent  
 **Impact** : Faible - nice to have
 
 **Manquant :**
+
 - [ ] Export des annonces utilisateur (CSV/JSON)
 - [ ] Export de l'historique des messages
 - [ ] Export des statistiques analytics
@@ -249,10 +286,12 @@
 ### 🟢 PRIORITÉ BASSE - Optimisations & Tests
 
 #### 8. **Mode Offline PWA** 📱
+
 **Statut** : ⚠️ Partiel  
 **Impact** : Faible - amélioration UX mobile
 
 **Manquant :**
+
 - [ ] Cache des pages visitées
 - [ ] Cache des API responses
 - [ ] Page offline (`/offline`)
@@ -264,15 +303,19 @@
 ---
 
 #### 9. **Tests Automatisés** 🧪
+
 **Statut** : ❌ Absent  
 **Impact** : Faible à moyen (qualité du code)
 
 **Manquant :**
+
 - [ ] Tests unitaires des composants
+
   - Composants UI (`Button`, `Input`, etc.)
   - Composants features (`ListingCard`, etc.)
 
 - [ ] Tests d'intégration des API
+
   - Routes d'authentification
   - Routes listings
   - Routes messages
@@ -285,23 +328,27 @@
 ---
 
 #### 10. **Analytics & Tracking** 📈
+
 **Statut** : ❌ Absent  
 **Impact** : Faible - business intelligence
 
 **Manquant :**
+
 - [ ] Intégrer Google Analytics ou similaire
+
   - Tracking des pages
   - Tracking des événements (création annonce, contact, etc.)
 
 - [ ] Créer `lib/analytics.ts`
+
   ```typescript
   export const EVENTS = {
-    LISTING_CREATED: 'listing_created',
-    LISTING_VIEWED: 'listing_viewed',
-    SELLER_CONTACTED: 'seller_contacted',
-    SUBSCRIPTION_PURCHASED: 'subscription_purchased',
-    MESSAGE_SENT: 'message_sent',
-    SEARCH_PERFORMED: 'search_performed'
+    LISTING_CREATED: "listing_created",
+    LISTING_VIEWED: "listing_viewed",
+    SELLER_CONTACTED: "seller_contacted",
+    SUBSCRIPTION_PURCHASED: "subscription_purchased",
+    MESSAGE_SENT: "message_sent",
+    SEARCH_PERFORMED: "search_performed",
   };
   ```
 
@@ -310,10 +357,12 @@
 ---
 
 #### 11. **Améliorations Paiements** 💳
+
 **Statut** : ⚠️ Structure existante  
 **Impact** : Moyen - fonctionnalité critique
 
 **À vérifier/compléter :**
+
 - [ ] Tests réels des paiements Wave/Orange Money
 - [ ] Gestion des erreurs de paiement
 - [ ] Webhooks de confirmation
@@ -324,17 +373,20 @@
 ## 📋 RÉSUMÉ PAR PRIORITÉ
 
 ### 🔴 Urgent (À implémenter en premier)
+
 1. **Back-office Administrateur** - Gestion de la plateforme
 2. **Annonces Featured & Similaires** - Découverte et visibilité
 3. **Contact Vendeur depuis Annonce** - Engagement utilisateur
 4. **Dashboard Analytics Utilisateur** - Expérience utilisateur
 
 ### 🟡 Important (À implémenter ensuite)
+
 5. **SearchAlerts** - Engagement et rétention
 6. **Homepage Enrichie** - Première impression
 7. **Améliorations Paiements** - Fiabilité critique
 
 ### 🟢 Nice to Have (Optimisations)
+
 8. **Mode Offline PWA** - UX mobile
 9. **Tests Automatisés** - Qualité du code
 10. **Analytics & Tracking** - Business intelligence
@@ -349,6 +401,7 @@
 - **Fonctionnalités manquantes** : ~11 (40%)
 
 ### Détail par catégorie :
+
 - ✅ **Authentification** : 100% complet
 - ✅ **Annonces (CRUD)** : 95% complet (manque featured/similaires)
 - ✅ **Chat** : 100% complet
@@ -366,22 +419,26 @@
 ## 🎯 PROCHAINES ÉTAPES RECOMMANDÉES
 
 ### Semaine 1-2 : Back-office Admin
+
 1. Créer les pages admin (`/admin`, `/admin/users`, `/admin/listings`)
 2. Créer les API routes admin
 3. Ajouter graphiques basiques (recharts)
 
 ### Semaine 3 : Featured & Similaires
+
 1. Implémenter `/api/listings/[id]/similar`
 2. Implémenter `/api/listings/[id]/feature`
 3. Afficher featured sur homepage
 4. Afficher similaires sur page détail
 
 ### Semaine 4 : Contact & Analytics
+
 1. Implémenter `/api/listings/[id]/contact`
 2. Créer `/dashboard/analytics`
 3. Améliorer dashboard principal avec stats réelles
 
 ### Semaine 5+ : Features avancées
+
 4. SearchAlerts
 5. Homepage enrichie
 6. Tests automatisés
@@ -392,19 +449,25 @@
 ## 📝 NOTES TECHNIQUES
 
 ### Modèle SearchAlert manquant
+
 Le PRD mentionne un modèle `SearchAlert` qui n'est pas dans le schema Prisma actuel. À ajouter si cette fonctionnalité est prioritaire.
 
 ### Middleware Admin
+
 Le middleware protège déjà `/admin/*` mais il n'y a pas de pages admin. Il faut créer les pages ET s'assurer que le middleware fonctionne correctement.
 
 ### Featured Annonces
+
 Les champs `isFeatured` et `featuredUntil` existent dans Prisma mais ne sont jamais utilisés. Il faut :
+
 1. API pour marquer comme featured
 2. Affichage sur homepage
 3. Job pour auto-expirer
 
 ### Dashboard Analytics
+
 Le dashboard actuel (`/dashboard`) affiche des valeurs statiques ("0"). Il faut :
+
 1. Récupérer les vraies statistiques
 2. Afficher graphiques
 3. Créer page analytics détaillée
@@ -413,4 +476,3 @@ Le dashboard actuel (`/dashboard`) affiche des valeurs statiques ("0"). Il faut 
 
 **Document généré le** : 2025-01-17  
 **Dernière vérification** : Comparaison PRD vs Codebase actuel
-

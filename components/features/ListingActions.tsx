@@ -47,11 +47,12 @@ export function ListingActions({ listingId, onDelete }: ListingActionsProps) {
 
   return (
     <div className="flex gap-2 mt-4">
-      <Link href={`/listings/edit/${listingId}`}>
-        <Button variant="outline" size="sm">
-          <Edit className="w-4 h-4 mr-2" />
-          Modifier
-        </Button>
+      <Link 
+        href={`/listings/edit/${listingId}`}
+        className="inline-flex items-center justify-center h-9 rounded-md border border-input bg-background px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+      >
+        <Edit className="w-4 h-4 mr-2" />
+        Modifier
       </Link>
       <Button
         variant="destructive"

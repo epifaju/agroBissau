@@ -32,7 +32,23 @@ export const listingSchema = z.object({
     lat: z.number().optional(),
     lng: z.number().optional(),
   }),
-});
+  // Champs promotion
+  originalPrice: z.number().positive().optional(),
+  discountPercent: z.number().int().min(0).max(100).optional(),
+  promotionUntil: z.date().optional(),
+}).refine(
+  (data) => {
+    // Si promotion, vérifier que originalPrice > price et discountPercent est cohérent
+    if (data.originalPrice && data.discountPercent) {
+      return data.originalPrice > data.price;
+    }
+    return true;
+  },
+  {
+    message: 'Le prix original doit être supérieur au prix avec promotion',
+    path: ['originalPrice'],
+  }
+);
 
 export const reviewSchema = z.object({
   rating: z.number().int().min(1).max(5),

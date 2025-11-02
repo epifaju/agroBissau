@@ -4,12 +4,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { LogoutButton } from '@/components/admin/LogoutButton';
 import { 
   LayoutDashboard, 
   Users, 
   FileText, 
   BarChart3,
-  LogOut,
+  Flag,
 } from 'lucide-react';
 
 export default async function AdminLayout({
@@ -28,6 +29,7 @@ export default async function AdminLayout({
     { href: '/admin', label: 'Tableau de bord', icon: LayoutDashboard },
     { href: '/admin/users', label: 'Utilisateurs', icon: Users },
     { href: '/admin/listings', label: 'Annonces', icon: FileText },
+    { href: '/admin/reports', label: 'Rapports', icon: Flag },
     { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   ];
 
@@ -59,13 +61,13 @@ export default async function AdminLayout({
           })}
         </nav>
 
-        <div className="absolute bottom-4 left-4 right-4">
+        <div className="absolute bottom-4 left-4 right-4 space-y-2">
           <Link href="/dashboard">
             <Button variant="outline" className="w-full justify-start">
-              <LogOut className="w-4 h-4 mr-2" />
               Retour au dashboard
             </Button>
           </Link>
+          <LogoutButton />
         </div>
       </aside>
 

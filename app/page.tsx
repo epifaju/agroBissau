@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Header } from '@/components/layout/Header';
 import { ListingCard } from '@/components/features/ListingCard';
@@ -57,8 +56,89 @@ async function getFeaturedListings() {
   }
 }
 
+async function getLatestListings(excludeFeaturedIds: string[] = []) {
+  try {
+    const listings = await prisma.listing.findMany({
+      where: {
+        status: 'ACTIVE',
+        // Exclure les featured actives pour ne pas les dupliquer
+        isFeatured: false,
+        // Exclure aussi les IDs déjà affichés en featured
+        ...(excludeFeaturedIds.length > 0 && {
+          id: { notIn: excludeFeaturedIds },
+        }),
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 6,
+    });
+
+    return listings.map((listing) => ({
+      id: listing.id,
+      title: listing.title,
+      price: listing.price,
+      unit: listing.unit,
+      location: listing.location,
+      images: listing.images,
+      createdAt: listing.createdAt.toISOString(),
+      user: listing.user,
+      isFeatured: listing.isFeatured,
+    }));
+  } catch (error) {
+    console.error('Error fetching latest listings:', error);
+    return [];
+  }
+}
+
+async function getGlobalStats() {
+  try {
+    const [totalListings, totalUsers] = await Promise.all([
+      prisma.listing.count({
+        where: { status: 'ACTIVE' },
+      }),
+      prisma.user.count({
+        where: { isActive: true },
+      }),
+    ]);
+
+    return {
+      totalListings,
+      totalUsers,
+    };
+  } catch (error) {
+    console.error('Error fetching global stats:', error);
+    return {
+      totalListings: 0,
+      totalUsers: 0,
+    };
+  }
+}
+
 export default async function HomePage() {
   const featuredListings = await getFeaturedListings();
+  const featuredIds = featuredListings.map((l) => l.id);
+  
+  const [latestListings, globalStats] = await Promise.all([
+    getLatestListings(featuredIds),
+    getGlobalStats(),
+  ]);
 
   return (
     <div className="min-h-screen">
@@ -76,13 +156,17 @@ export default async function HomePage() {
             sur une plateforme moderne et sécurisée.
           </p>
           <div className="flex gap-4 justify-center">
-            <Link href="/register">
-              <Button size="lg">Commencer gratuitement</Button>
+            <Link 
+              href="/register"
+              className="inline-flex items-center justify-center h-11 rounded-md px-8 bg-green-600 text-white hover:bg-green-700 text-sm font-medium transition-colors"
+            >
+              Commencer gratuitement
             </Link>
-            <Link href="/listings">
-              <Button size="lg" variant="outline">
-                Voir les annonces
-              </Button>
+            <Link 
+              href="/listings"
+              className="inline-flex items-center justify-center h-11 rounded-md px-8 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors"
+            >
+              Voir les annonces
             </Link>
           </div>
         </div>
@@ -93,8 +177,11 @@ export default async function HomePage() {
         <section className="py-20 container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold">Annonces en vedette</h2>
-            <Link href="/listings">
-              <Button variant="outline">Voir toutes les annonces</Button>
+            <Link 
+              href="/listings"
+              className="inline-flex items-center justify-center h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors"
+            >
+              Voir toutes les annonces
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -104,6 +191,52 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Latest Listings */}
+      {latestListings.length > 0 && (
+        <section className="py-20 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-bold">Dernières annonces</h2>
+              <Link 
+                href="/listings"
+                className="inline-flex items-center justify-center h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors"
+              >
+                Voir toutes les annonces
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {latestListings.map((listing) => (
+                <ListingCard key={listing.id} listing={listing} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Global Stats */}
+      <section className="py-16 bg-green-600 text-white">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold mb-2">
+                {globalStats.totalListings.toLocaleString('fr-FR')}
+              </div>
+              <p className="text-green-100">Annonces actives</p>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">
+                {globalStats.totalUsers.toLocaleString('fr-FR')}
+              </div>
+              <p className="text-green-100">Utilisateurs actifs</p>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">100%</div>
+              <p className="text-green-100">Satisfaction client</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Features */}
       <section className="py-20 container mx-auto px-4">
@@ -148,10 +281,11 @@ export default async function HomePage() {
           <p className="text-green-100 mb-8">
             Rejoignez des centaines d'utilisateurs sur AgroBissau
           </p>
-          <Link href="/register">
-            <Button size="lg" variant="secondary">
-              Créer un compte gratuit
-            </Button>
+          <Link 
+            href="/register"
+            className="inline-flex items-center justify-center h-11 rounded-md px-8 bg-gray-200 text-gray-900 hover:bg-gray-300 text-sm font-medium transition-colors"
+          >
+            Créer un compte gratuit
           </Link>
         </div>
       </section>

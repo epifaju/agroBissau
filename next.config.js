@@ -38,8 +38,54 @@ if (process.env.NODE_ENV === 'production' || process.env.ENABLE_PWA === 'true') 
         options: {
           cacheName: 'cloudinary-images',
           expiration: {
-            maxEntries: 64,
+            maxEntries: 100,
             maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+          },
+        },
+      },
+      {
+        urlPattern: /^\/api\/listings\/.*$/i,
+        handler: 'NetworkFirst',
+        options: {
+          cacheName: 'listings-api',
+          expiration: {
+            maxEntries: 50,
+            maxAgeSeconds: 60 * 60, // 1 hour
+          },
+          networkTimeoutSeconds: 10,
+        },
+      },
+      {
+        urlPattern: /^\/api\/categories$/i,
+        handler: 'CacheFirst',
+        options: {
+          cacheName: 'categories-api',
+          expiration: {
+            maxEntries: 10,
+            maxAgeSeconds: 24 * 60 * 60, // 24 hours
+          },
+        },
+      },
+      {
+        urlPattern: /^\/listings\/.*$/i,
+        handler: 'NetworkFirst',
+        options: {
+          cacheName: 'listings-pages',
+          expiration: {
+            maxEntries: 30,
+            maxAgeSeconds: 60 * 60, // 1 hour
+          },
+          networkTimeoutSeconds: 10,
+        },
+      },
+      {
+        urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
+        handler: 'CacheFirst',
+        options: {
+          cacheName: 'images',
+          expiration: {
+            maxEntries: 100,
+            maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
           },
         },
       },

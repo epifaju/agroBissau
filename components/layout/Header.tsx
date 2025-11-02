@@ -2,11 +2,24 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/components/features/SearchBar';
+import { LogOut } from 'lucide-react';
 
 export function Header() {
   const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut({ 
+      redirect: false,
+      callbackUrl: '/' 
+    });
+    router.push('/');
+    router.refresh();
+  };
 
   return (
     <header className="border-b bg-white sticky top-0 z-50">
@@ -29,25 +42,44 @@ export function Header() {
             </Link>
             {isAuthenticated ? (
               <>
-                <Link href="/dashboard">
-                  <Button variant="ghost">Dashboard</Button>
+                <Link 
+                  href="/dashboard"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-gray-100 rounded-md transition-colors"
+                >
+                  Dashboard
                 </Link>
                 {(user as any)?.role === 'ADMIN' && (
-                  <Link href="/admin">
-                    <Button variant="ghost" className="text-red-600 hover:text-red-700">
-                      Admin
-                    </Button>
+                  <Link 
+                    href="/admin"
+                    className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                  >
+                    Admin
                   </Link>
                 )}
                 <span className="text-sm text-gray-600">{user?.name || user?.email}</span>
+                <Button 
+                  variant="ghost" 
+                  onClick={handleLogout}
+                  className="text-gray-600 hover:text-red-600"
+                  title="Déconnexion"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Déconnexion
+                </Button>
               </>
             ) : (
               <>
-                <Link href="/login">
-                  <Button variant="ghost">Connexion</Button>
+                <Link 
+                  href="/login"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-gray-100 rounded-md transition-colors"
+                >
+                  Connexion
                 </Link>
-                <Link href="/register">
-                  <Button>S'inscrire</Button>
+                <Link 
+                  href="/register"
+                  className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors"
+                >
+                  S'inscrire
                 </Link>
               </>
             )}

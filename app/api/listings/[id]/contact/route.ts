@@ -152,6 +152,16 @@ export async function POST(
         console.error('Error sending notification:', notificationError);
         // Ne pas faire échouer la requête si la notification échoue
       }
+
+      // Check and award badges (async, don't block response)
+      try {
+        const { checkAndAwardBadges } = await import('@/lib/badges');
+        checkAndAwardBadges({ type: 'contact_received', userId: sellerId, listingId }).catch((err) => {
+          console.error('Error awarding badges:', err);
+        });
+      } catch (badgeError) {
+        console.error('Badge check error:', badgeError);
+      }
     }
 
     return NextResponse.json({

@@ -35,7 +35,7 @@ export default function EditListingPage() {
       const response = await fetch(`/api/listings/${listingId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+          body: JSON.stringify({
           title: formData.title,
           description: formData.description,
           price: parseFloat(formData.price),
@@ -52,6 +52,13 @@ export default function EditListingPage() {
             lat: (formData as any).lat || 0,
             lng: (formData as any).lng || 0,
           },
+          // Champs promotion
+          originalPrice: formData.isPromotion && formData.originalPrice 
+            ? parseFloat(formData.originalPrice) 
+            : undefined,
+          promotionUntil: formData.isPromotion && formData.promotionUntil
+            ? new Date(formData.promotionUntil).toISOString()
+            : undefined,
         }),
       });
 

@@ -26,6 +26,7 @@ export interface FilterValues {
   minPrice?: string;
   maxPrice?: string;
   sortBy?: 'newest' | 'oldest' | 'price_asc' | 'price_desc';
+  promotion?: boolean;
 }
 
 const cities = [
@@ -53,6 +54,7 @@ export function SearchFilters({ onFiltersChange, showCard = true }: SearchFilter
     minPrice: searchParams.get('min_price') || '',
     maxPrice: searchParams.get('max_price') || '',
     sortBy: (searchParams.get('sort') as any) || 'newest',
+    promotion: searchParams.get('promotion') === 'true',
   });
   const [showFilters, setShowFilters] = useState(false);
 
@@ -84,6 +86,7 @@ export function SearchFilters({ onFiltersChange, showCard = true }: SearchFilter
     if (updated.minPrice) params.set('min_price', updated.minPrice);
     if (updated.maxPrice) params.set('max_price', updated.maxPrice);
     if (updated.sortBy && updated.sortBy !== 'newest') params.set('sort', updated.sortBy);
+    if (updated.promotion) params.set('promotion', 'true');
 
     router.push(`/search?${params.toString()}`, { scroll: false });
   };
@@ -212,6 +215,19 @@ export function SearchFilters({ onFiltersChange, showCard = true }: SearchFilter
             onChange={(e) => updateFilters({ maxPrice: e.target.value })}
           />
         </div>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          id="promotion"
+          checked={filters.promotion || false}
+          onChange={(e) => updateFilters({ promotion: e.target.checked || undefined })}
+          className="h-4 w-4 text-green-600 rounded"
+        />
+        <Label htmlFor="promotion" className="cursor-pointer">
+          Annonces en promotion uniquement
+        </Label>
       </div>
 
       {hasActiveFilters && (

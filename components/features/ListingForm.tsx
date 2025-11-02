@@ -70,6 +70,9 @@ export function ListingForm({
     images: initialData?.images || [],
     availableFrom: initialData?.availableFrom || '',
     expiresAt: initialData?.expiresAt || '',
+    isPromotion: initialData?.isPromotion || false,
+    originalPrice: initialData?.originalPrice || '',
+    promotionUntil: initialData?.promotionUntil || '',
   });
 
   // Charger les catégories
@@ -100,6 +103,9 @@ export function ListingForm({
             images: data.images || [],
             availableFrom: data.availableFrom || '',
             expiresAt: data.expiresAt || '',
+            isPromotion: !!(data.originalPrice || data.discountPercent),
+            originalPrice: data.originalPrice?.toString() || '',
+            promotionUntil: data.promotionUntil || '',
           });
         })
         .catch((err) => {
@@ -220,9 +226,80 @@ export function ListingForm({
               <SelectItem value="pièce">pièce</SelectItem>
               <SelectItem value="sac">sac</SelectItem>
               <SelectItem value="carton">carton</SelectItem>
+              <SelectItem value="litre">litre</SelectItem>
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      {/* Section Promotion */}
+      <div className="border rounded-lg p-4 space-y-4 bg-gray-50">
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="isPromotion"
+            checked={formData.isPromotion}
+            onChange={(e) => {
+              const isPromotion = e.target.checked;
+              setFormData({
+                ...formData,
+                isPromotion,
+                originalPrice: isPromotion && !formData.originalPrice ? formData.price : formData.originalPrice,
+                ...(isPromotion ? {} : { originalPrice: '', promotionUntil: '' }),
+              });
+            }}
+            className="h-4 w-4 text-green-600 rounded"
+          />
+          <Label htmlFor="isPromotion" className="font-semibold cursor-pointer">
+            Mettre cette annonce en promotion
+          </Label>
+        </div>
+
+        {formData.isPromotion && (
+          <div className="space-y-4 pl-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="originalPrice">Prix original (CFA) *</Label>
+                <Input
+                  id="originalPrice"
+                  type="number"
+                  step="0.01"
+                  value={formData.originalPrice}
+                  onChange={(e) => {
+                    const originalPrice = e.target.value;
+                    setFormData({
+                      ...formData,
+                      originalPrice,
+                    });
+                  }}
+                  required={formData.isPromotion}
+                  placeholder="Prix avant réduction"
+                />
+                {formData.originalPrice && formData.price && (
+                  parseFloat(formData.originalPrice) <= parseFloat(formData.price) ? (
+                    <p className="text-xs text-red-600">
+                      Le prix original doit être supérieur au prix de promotion
+                    </p>
+                  ) : (
+                    <p className="text-xs text-green-600">
+                      Réduction de {Math.round(((parseFloat(formData.originalPrice) - parseFloat(formData.price)) / parseFloat(formData.originalPrice)) * 100)}%
+                    </p>
+                  )
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="promotionUntil">Date de fin (optionnel)</Label>
+                <Input
+                  id="promotionUntil"
+                  type="datetime-local"
+                  value={formData.promotionUntil}
+                  onChange={(e) => setFormData({ ...formData, promotionUntil: e.target.value })}
+                  min={new Date().toISOString().slice(0, 16)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">

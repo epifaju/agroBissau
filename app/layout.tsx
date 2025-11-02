@@ -6,9 +6,24 @@ import { Providers } from '@/components/providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'AgroBissau - Marketplace Agroalimentaire',
+  title: {
+    default: 'AgroBissau - Marketplace Agroalimentaire',
+    template: '%s | AgroBissau',
+  },
   description: 'Plateforme B2B/B2C connectant producteurs, vendeurs, acheteurs et exportateurs agricoles en Guinée-Bissau',
   manifest: '/manifest.json',
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    siteName: 'AgroBissau',
+    title: 'AgroBissau - Marketplace Agroalimentaire',
+    description: 'Plateforme B2B/B2C connectant producteurs, vendeurs, acheteurs et exportateurs agricoles en Guinée-Bissau',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AgroBissau - Marketplace Agroalimentaire',
+    description: 'Plateforme B2B/B2C connectant producteurs, vendeurs, acheteurs et exportateurs agricoles en Guinée-Bissau',
+  },
 };
 
 export const viewport: Viewport = {

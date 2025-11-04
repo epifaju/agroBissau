@@ -64,32 +64,32 @@ export async function GET(req: NextRequest) {
     });
 
     // Calculer les métriques globales
-    const totalViews = listings.reduce((sum, l) => sum + l.viewCount, 0);
-    const totalContacts = listings.reduce((sum, l) => sum + l.contactCount, 0);
+    const totalViews = listings.reduce((sum, l) => sum + (l.viewCount || 0), 0);
+    const totalContacts = listings.reduce((sum, l) => sum + (l.contactCount || 0), 0);
     const activeListings = listings.filter((l) => l.status === 'ACTIVE').length;
 
     // Top annonces par vues
     const topByViews = [...listings]
-      .sort((a, b) => b.viewCount - a.viewCount)
+      .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
       .slice(0, 5)
       .map((l) => ({
         id: l.id,
         title: l.title,
-        views: l.viewCount,
-        contacts: l.contactCount,
+        views: l.viewCount || 0,
+        contacts: l.contactCount || 0,
         status: l.status,
         category: l.category.name,
       }));
 
     // Top annonces par contacts
     const topByContacts = [...listings]
-      .sort((a, b) => b.contactCount - a.contactCount)
+      .sort((a, b) => (b.contactCount || 0) - (a.contactCount || 0))
       .slice(0, 5)
       .map((l) => ({
         id: l.id,
         title: l.title,
-        views: l.viewCount,
-        contacts: l.contactCount,
+        views: l.viewCount || 0,
+        contacts: l.contactCount || 0,
         status: l.status,
         category: l.category.name,
       }));
@@ -108,8 +108,8 @@ export async function GET(req: NextRequest) {
       dailyData[dateKey].listings += 1;
       // Ajouter les vues et contacts de cette annonce au jour de création
       // Note: Dans une vraie app, on aurait une table de logs pour tracker jour par jour
-      dailyData[dateKey].views += listing.viewCount;
-      dailyData[dateKey].contacts += listing.contactCount;
+      dailyData[dateKey].views += listing.viewCount || 0;
+      dailyData[dateKey].contacts += listing.contactCount || 0;
     });
 
     // Trier les données par date
@@ -130,8 +130,8 @@ export async function GET(req: NextRequest) {
         categoryStats[catName] = { count: 0, views: 0, contacts: 0 };
       }
       categoryStats[catName].count += 1;
-      categoryStats[catName].views += listing.viewCount;
-      categoryStats[catName].contacts += listing.contactCount;
+      categoryStats[catName].views += listing.viewCount || 0;
+      categoryStats[catName].contacts += listing.contactCount || 0;
     });
 
     const categoryData = Object.entries(categoryStats).map(([name, stats]) => ({

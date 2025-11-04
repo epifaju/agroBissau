@@ -201,9 +201,11 @@ export default function AnalyticsPage() {
               <Eye className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{analytics.metrics.totalViews}</div>
+              <div className="text-2xl font-bold">
+                {analytics.metrics.totalViews?.toLocaleString('fr-FR') || 0}
+              </div>
               <p className="text-xs text-muted-foreground">
-                {analytics.metrics.averageViews} en moyenne
+                {analytics.metrics.averageViews?.toLocaleString('fr-FR') || 0} en moyenne
               </p>
             </CardContent>
           </Card>
@@ -214,9 +216,11 @@ export default function AnalyticsPage() {
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{analytics.metrics.totalContacts}</div>
+              <div className="text-2xl font-bold">
+                {analytics.metrics.totalContacts?.toLocaleString('fr-FR') || 0}
+              </div>
               <p className="text-xs text-muted-foreground">
-                {analytics.metrics.averageContacts} en moyenne
+                {analytics.metrics.averageContacts?.toLocaleString('fr-FR') || 0} en moyenne
               </p>
             </CardContent>
           </Card>
@@ -363,9 +367,11 @@ export default function AnalyticsPage() {
                         <p className="text-sm text-gray-500">{listing.category}</p>
                       </div>
                       <div className="text-right">
-                        <div className="font-bold">{listing.views} vues</div>
+                        <div className="font-bold text-lg">
+                          {listing.views?.toLocaleString('fr-FR') || 0} vues
+                        </div>
                         <div className="text-sm text-gray-500">
-                          {listing.contacts} contacts
+                          {listing.contacts?.toLocaleString('fr-FR') || 0} contacts
                         </div>
                       </div>
                     </div>
@@ -407,9 +413,11 @@ export default function AnalyticsPage() {
                         <p className="text-sm text-gray-500">{listing.category}</p>
                       </div>
                       <div className="text-right">
-                        <div className="font-bold">{listing.contacts} contacts</div>
+                        <div className="font-bold text-lg">
+                          {listing.contacts?.toLocaleString('fr-FR') || 0} contacts
+                        </div>
                         <div className="text-sm text-gray-500">
-                          {listing.views} vues
+                          {listing.views?.toLocaleString('fr-FR') || 0} vues
                         </div>
                       </div>
                     </div>

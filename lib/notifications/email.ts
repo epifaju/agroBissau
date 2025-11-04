@@ -486,8 +486,23 @@ export async function sendEmailVerificationEmail(
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
           .header { background: #2563eb; color: white; padding: 20px; text-align: center; }
           .content { padding: 20px; background: #f9fafb; }
-          .verification-box { background: white; padding: 20px; border: 2px solid #2563eb; border-radius: 5px; margin: 20px 0; text-align: center; }
-          .button { display: inline-block; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+          .verification-box { background: white; padding: 30px 20px; border: 2px solid #2563eb; border-radius: 8px; margin: 20px 0; text-align: center; }
+          .button { 
+            display: inline-block; 
+            padding: 16px 32px; 
+            background: #1d4ed8; 
+            color: #ffffff !important; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            margin-top: 10px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          }
+          .button:hover { 
+            background: #1e40af; 
+          }
           .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; }
           .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }
         </style>
@@ -502,7 +517,7 @@ export async function sendEmailVerificationEmail(
             <p>Merci de vous être inscrit sur AgroBissau ! Pour activer votre compte, veuillez vérifier votre adresse email en cliquant sur le bouton ci-dessous :</p>
             
             <div class="verification-box">
-              <a href="${verificationUrl}" class="button">
+              <a href="${verificationUrl}" class="button" style="display: inline-block; padding: 16px 32px; background: #1d4ed8; color: #ffffff !important; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">
                 Vérifier mon email
               </a>
             </div>

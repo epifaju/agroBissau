@@ -39,7 +39,16 @@ export async function POST(req: Request) {
 
     // Generate verification token
     const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    // Create expiration date: 24 hours from now (using UTC to avoid timezone issues)
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    
+    console.log('📧 Creating verification token:', {
+      userId: user.id,
+      email: user.email,
+      token: token.substring(0, 8) + '...',
+      expiresAt: expiresAt.toISOString(),
+      expiresIn: '24 hours',
+    });
 
     // Create verification record
     await prisma.emailVerification.create({
@@ -49,6 +58,8 @@ export async function POST(req: Request) {
         expiresAt,
       },
     });
+    
+    console.log('✅ Verification token created successfully');
 
     // Send verification email (don't await to avoid blocking)
     sendEmailVerificationEmail(

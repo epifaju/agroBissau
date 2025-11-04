@@ -21,14 +21,55 @@ export async function GET(req: NextRequest) {
     });
 
     if (!verification) {
+      console.log('❌ Verification token not found:', token);
       return NextResponse.json(
         { error: 'Token de vérification invalide ou expiré' },
         { status: 400 }
       );
     }
 
-    // Check if token expired
-    if (new Date() > verification.expiresAt) {
+    // Log verification details for debugging
+    const now = new Date();
+    const expiresAt = new Date(verification.expiresAt);
+    const timeUntilExpiry = expiresAt.getTime() - now.getTime();
+    const hoursUntilExpiry = timeUntilExpiry / (1000 * 60 * 60);
+    
+    console.log('🔍 Verification token details:', {
+      token: token.substring(0, 8) + '...',
+      userId: verification.userId,
+      createdAt: verification.createdAt,
+      expiresAt: expiresAt.toISOString(),
+      now: now.toISOString(),
+      timeUntilExpiry: `${hoursUntilExpiry.toFixed(2)} hours`,
+      isExpired: now > expiresAt,
+    });
+
+    // Check if already verified (check this first before expiration)
+    if (verification.user.isEmailVerified) {
+      // Delete verification record
+      await prisma.emailVerification.delete({
+        where: { token },
+      });
+
+      console.log('✅ Email already verified for user:', verification.userId);
+      return NextResponse.json(
+        { message: 'Email déjà vérifié' },
+        { status: 200 }
+      );
+    }
+
+    // Check if token expired (using UTC comparison to avoid timezone issues)
+    const nowUTC = Date.now();
+    const expiresAtUTC = expiresAt.getTime();
+    
+    if (nowUTC >= expiresAtUTC) {
+      console.log('❌ Token expired:', {
+        nowUTC: new Date(nowUTC).toISOString(),
+        expiresAtUTC: new Date(expiresAtUTC).toISOString(),
+        diffMs: nowUTC - expiresAtUTC,
+        diffHours: (nowUTC - expiresAtUTC) / (1000 * 60 * 60),
+      });
+      
       // Delete expired verification
       await prisma.emailVerification.delete({
         where: { token },
@@ -40,23 +81,15 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Check if already verified
-    if (verification.user.isEmailVerified) {
-      // Delete verification record
-      await prisma.emailVerification.delete({
-        where: { token },
-      });
-
-      return NextResponse.json(
-        { message: 'Email déjà vérifié' },
-        { status: 200 }
-      );
-    }
-
     // Mark email as verified
     await prisma.user.update({
       where: { id: verification.userId },
       data: { isEmailVerified: true },
+    });
+
+    console.log('✅ Email verified successfully for user:', {
+      userId: verification.userId,
+      email: verification.user.email,
     });
 
     // Delete verification record
@@ -86,7 +119,10 @@ export async function GET(req: NextRequest) {
       });
 
     return NextResponse.json(
-      { message: 'Email vérifié avec succès' },
+      { 
+        message: 'Email vérifié avec succès',
+        verified: true,
+      },
       { status: 200 }
     );
   } catch (error) {
@@ -138,7 +174,16 @@ export async function POST(req: NextRequest) {
     // Generate new verification token
     const crypto = await import('crypto');
     const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    // Create expiration date: 24 hours from now (using UTC to avoid timezone issues)
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    
+    console.log('📧 Resending verification token:', {
+      userId: user.id,
+      email: user.email,
+      token: token.substring(0, 8) + '...',
+      expiresAt: expiresAt.toISOString(),
+      expiresIn: '24 hours',
+    });
 
     // Create verification record
     await prisma.emailVerification.create({
@@ -148,6 +193,8 @@ export async function POST(req: NextRequest) {
         expiresAt,
       },
     });
+    
+    console.log('✅ Verification token resent successfully');
 
     // Send verification email (don't await)
     const { sendEmailVerificationEmail } = await import('@/lib/notifications/email');

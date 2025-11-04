@@ -13,22 +13,33 @@ export default function VerifyEmailPage() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading');
   const [message, setMessage] = useState('');
   const [resending, setResending] = useState(false);
+  const [verificationAttempted, setVerificationAttempted] = useState(false);
 
   const token = searchParams.get('token');
   const email = searchParams.get('email');
 
   useEffect(() => {
-    if (token) {
+    // Only run verification once when token is available and not already attempted
+    if (token && !verificationAttempted) {
+      setVerificationAttempted(true);
       verifyEmail();
-    } else {
+    } else if (!token) {
       setStatus('error');
       setMessage('Token de vérification manquant');
     }
-  }, [token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array to run only once
 
   const verifyEmail = async () => {
+    if (!token) {
+      setStatus('error');
+      setMessage('Token de vérification manquant');
+      return;
+    }
+
     try {
-      const response = await fetch(`/api/auth/verify-email?token=${token}`);
+      setStatus('loading');
+      const response = await fetch(`/api/auth/verify-email?token=${encodeURIComponent(token)}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -36,8 +47,15 @@ export default function VerifyEmailPage() {
         setMessage(data.message || 'Votre email a été vérifié avec succès !');
         
         // Redirect to login after 3 seconds
+        // Use window.location for a full page reload to avoid chunk loading issues
         setTimeout(() => {
-          router.push('/login?verified=true');
+          try {
+            window.location.href = '/login?verified=true';
+          } catch (navError) {
+            console.error('Navigation error:', navError);
+            // Final fallback
+            window.location.replace('/login?verified=true');
+          }
         }, 3000);
       } else {
         if (data.error?.includes('expiré')) {
@@ -48,8 +66,9 @@ export default function VerifyEmailPage() {
         setMessage(data.error || 'Une erreur est survenue lors de la vérification');
       }
     } catch (error) {
+      console.error('Verification error:', error);
       setStatus('error');
-      setMessage('Erreur lors de la vérification');
+      setMessage('Erreur lors de la vérification. Veuillez réessayer.');
     }
   };
 

@@ -160,16 +160,23 @@
   "auth": {
     "login": {
       "title": "Login",
+      "description": "Sign in to your AgroBissau account",
       "email": "Email",
       "password": "Password",
       "submit": "Sign In",
+      "submitting": "Signing in...",
       "noAccount": "Don't have an account yet?",
       "registerLink": "Register",
       "forgotPassword": "Forgot password?",
-      "googleSignIn": "Continue with Google"
+      "googleSignIn": "Continue with Google",
+      "error": {
+        "invalid": "Invalid email or password",
+        "generic": "An error occurred"
+      }
     },
     "register": {
       "title": "Register",
+      "description": "Create your AgroBissau account",
       "firstName": "First Name",
       "lastName": "Last Name",
       "email": "Email",
@@ -185,10 +192,7 @@
       "agreement": "By registering, you agree to our terms of use and privacy policy.",
       "error": {
         "generic": "An error occurred"
-      },
-      "loginLink": "Sign in",
-      "googleSignUp": "Continue with Google",
-      "agreement": "By registering, you agree to our terms of use and privacy policy."
+      }
     }
   },
   "dashboard": {

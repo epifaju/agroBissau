@@ -160,16 +160,23 @@
   "auth": {
     "login": {
       "title": "Entra",
+      "description": "Entra na bu konta AgroBissau",
       "email": "Email",
       "password": "Senha",
       "submit": "Entra",
+      "submitting": "Ka entra...",
       "noAccount": "Ainda na ten konta?",
       "registerLink": "Registra",
       "forgotPassword": "Eskeceu senha?",
-      "googleSignIn": "Kontinua ku Google"
+      "googleSignIn": "Kontinua ku Google",
+      "error": {
+        "invalid": "Email o senha eradu",
+        "generic": "Ocorru un erru"
+      }
     },
     "register": {
       "title": "Registra",
+      "description": "Kria bu konta AgroBissau",
       "firstName": "Nomi",
       "lastName": "Apelidu",
       "email": "Email",
@@ -185,10 +192,7 @@
       "agreement": "Bu registra, bu akorda ku nosus kondisaun di uzu i politika privasidadi.",
       "error": {
         "generic": "Ocorru un erru"
-      },
-      "loginLink": "Entra",
-      "googleSignUp": "Kontinua ku Google",
-      "agreement": "Bu registra, bu akorda ku nosus kondisaun di uzu i politika privasidadi."
+      }
     }
   },
   "dashboard": {

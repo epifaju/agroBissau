@@ -160,16 +160,23 @@
   "auth": {
     "login": {
       "title": "Entrar",
+      "description": "Entre na sua conta AgroBissau",
       "email": "Email",
       "password": "Senha",
       "submit": "Entrar",
+      "submitting": "Entrando...",
       "noAccount": "Ainda não tem uma conta?",
       "registerLink": "Registrar",
       "forgotPassword": "Esqueceu a senha?",
-      "googleSignIn": "Continuar com Google"
+      "googleSignIn": "Continuar com Google",
+      "error": {
+        "invalid": "Email ou senha incorretos",
+        "generic": "Ocorreu um erro"
+      }
     },
     "register": {
       "title": "Registrar",
+      "description": "Crie sua conta AgroBissau",
       "firstName": "Nome",
       "lastName": "Sobrenome",
       "email": "Email",
@@ -178,10 +185,14 @@
       "password": "Senha",
       "confirmPassword": "Confirmar senha",
       "submit": "Registrar",
+      "submitting": "Registrando...",
       "hasAccount": "Já tem uma conta?",
       "loginLink": "Entrar",
       "googleSignUp": "Continuar com Google",
-      "agreement": "Ao se registrar, você concorda com nossos termos de uso e política de privacidade."
+      "agreement": "Ao se registrar, você concorda com nossos termos de uso e política de privacidade.",
+      "error": {
+        "generic": "Ocorreu um erro"
+      }
     }
   },
   "dashboard": {

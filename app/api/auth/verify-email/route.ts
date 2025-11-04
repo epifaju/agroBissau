@@ -68,9 +68,22 @@ export async function GET(req: NextRequest) {
     sendEmailVerifiedEmail(
       verification.user.email,
       `${verification.user.firstName} ${verification.user.lastName}`
-    ).catch((error) => {
-      console.error('Error sending verification confirmation email:', error);
-    });
+    )
+      .then((success) => {
+        if (success) {
+          console.log('✅ Verification confirmation email sent successfully to:', verification.user.email);
+        } else {
+          console.error('❌ Failed to send verification confirmation email to:', verification.user.email);
+        }
+      })
+      .catch((error) => {
+        console.error('❌ Error sending verification confirmation email:', error);
+        console.error('Error details:', {
+          message: error?.message,
+          stack: error?.stack,
+          email: verification.user.email,
+        });
+      });
 
     return NextResponse.json(
       { message: 'Email vérifié avec succès' },
@@ -142,9 +155,22 @@ export async function POST(req: NextRequest) {
       user.email,
       `${user.firstName} ${user.lastName}`,
       token
-    ).catch((error) => {
-      console.error('Error sending verification email:', error);
-    });
+    )
+      .then((success) => {
+        if (success) {
+          console.log('✅ Verification email resent successfully to:', user.email);
+        } else {
+          console.error('❌ Failed to resend verification email to:', user.email);
+        }
+      })
+      .catch((error) => {
+        console.error('❌ Error resending verification email:', error);
+        console.error('Error details:', {
+          message: error?.message,
+          stack: error?.stack,
+          email: user.email,
+        });
+      });
 
     return NextResponse.json(
       { message: 'Un nouveau lien de vérification a été envoyé à votre email' },

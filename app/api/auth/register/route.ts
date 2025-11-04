@@ -55,9 +55,22 @@ export async function POST(req: Request) {
       validated.email,
       `${validated.firstName} ${validated.lastName}`,
       token
-    ).catch((error) => {
-      console.error('Error sending verification email:', error);
-    });
+    )
+      .then((success) => {
+        if (success) {
+          console.log('✅ Verification email sent successfully to:', validated.email);
+        } else {
+          console.error('❌ Failed to send verification email to:', validated.email);
+        }
+      })
+      .catch((error) => {
+        console.error('❌ Error sending verification email:', error);
+        console.error('Error details:', {
+          message: error?.message,
+          stack: error?.stack,
+          email: validated.email,
+        });
+      });
 
     return NextResponse.json(
       { 
